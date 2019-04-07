@@ -1,0 +1,339 @@
+{
+  "data": [
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 2, 
+      "satellite_cycle_number": 4, 
+      "time": 2016.39327945, 
+      "water_surface_height_above_reference_datum": 353.1535, 
+      "water_surface_height_uncertainty": 0.0358
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 5, 
+      "time": 2016.46704994, 
+      "water_surface_height_above_reference_datum": 353.829, 
+      "water_surface_height_uncertainty": 0.0637
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 5, 
+      "satellite_cycle_number": 6, 
+      "time": 2016.54082043, 
+      "water_surface_height_above_reference_datum": 355.7359, 
+      "water_surface_height_uncertainty": 1.3711
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 7, 
+      "time": 2016.61459092, 
+      "water_surface_height_above_reference_datum": 361.838, 
+      "water_surface_height_uncertainty": 0.1296
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 8, 
+      "time": 2016.68836141, 
+      "water_surface_height_above_reference_datum": 363.897, 
+      "water_surface_height_uncertainty": 0.025
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 5, 
+      "satellite_cycle_number": 9, 
+      "time": 2016.76213191, 
+      "water_surface_height_above_reference_datum": 364.6833, 
+      "water_surface_height_uncertainty": 0.5896
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 10, 
+      "time": 2016.8359024, 
+      "water_surface_height_above_reference_datum": 359.9329, 
+      "water_surface_height_uncertainty": 0.1133
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 11, 
+      "time": 2016.90967289, 
+      "water_surface_height_above_reference_datum": 357.1973, 
+      "water_surface_height_uncertainty": 1.0338
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 3, 
+      "satellite_cycle_number": 12, 
+      "time": 2016.98344338, 
+      "water_surface_height_above_reference_datum": 354.9681, 
+      "water_surface_height_uncertainty": 0.0129
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 13, 
+      "time": 2017.05737062, 
+      "water_surface_height_above_reference_datum": 354.4909, 
+      "water_surface_height_uncertainty": 0.1155
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 14, 
+      "time": 2017.13134323, 
+      "water_surface_height_above_reference_datum": 354.1298, 
+      "water_surface_height_uncertainty": 0.162
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 3, 
+      "satellite_cycle_number": 15, 
+      "time": 2017.20531583, 
+      "water_surface_height_above_reference_datum": 353.8455, 
+      "water_surface_height_uncertainty": 0.045
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 16, 
+      "time": 2017.27928843, 
+      "water_surface_height_above_reference_datum": 353.5008, 
+      "water_surface_height_uncertainty": 0.0585
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 3, 
+      "satellite_cycle_number": 17, 
+      "time": 2017.35326104, 
+      "water_surface_height_above_reference_datum": 353.1709, 
+      "water_surface_height_uncertainty": 0.0453
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 19, 
+      "time": 2017.50120624, 
+      "water_surface_height_above_reference_datum": 355.0507, 
+      "water_surface_height_uncertainty": 0.1332
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 20, 
+      "time": 2017.57517884, 
+      "water_surface_height_above_reference_datum": 357.3837, 
+      "water_surface_height_uncertainty": 0.1183
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 21, 
+      "time": 2017.64915145, 
+      "water_surface_height_above_reference_datum": 360.4408, 
+      "water_surface_height_uncertainty": 0.0188
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 5, 
+      "satellite_cycle_number": 22, 
+      "time": 2017.72312405, 
+      "water_surface_height_above_reference_datum": 360.8372, 
+      "water_surface_height_uncertainty": 0.0882
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 2, 
+      "satellite_cycle_number": 23, 
+      "time": 2017.79709665, 
+      "water_surface_height_above_reference_datum": 359.6885, 
+      "water_surface_height_uncertainty": 0.1469
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 3, 
+      "satellite_cycle_number": 24, 
+      "time": 2017.87106925, 
+      "water_surface_height_above_reference_datum": 355.4124, 
+      "water_surface_height_uncertainty": 0.064
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 25, 
+      "time": 2017.94504186, 
+      "water_surface_height_above_reference_datum": 354.6977, 
+      "water_surface_height_uncertainty": 0.118
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 2, 
+      "satellite_cycle_number": 26, 
+      "time": 2018.01901446, 
+      "water_surface_height_above_reference_datum": 354.1736, 
+      "water_surface_height_uncertainty": 0.2038
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 2, 
+      "satellite_cycle_number": 27, 
+      "time": 2018.09298706, 
+      "water_surface_height_above_reference_datum": 353.8816, 
+      "water_surface_height_uncertainty": 0.0626
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 3, 
+      "satellite_cycle_number": 29, 
+      "time": 2018.24093227, 
+      "water_surface_height_above_reference_datum": 353.4444, 
+      "water_surface_height_uncertainty": 0.1057
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 30, 
+      "time": 2018.31490487, 
+      "water_surface_height_above_reference_datum": 353.4321, 
+      "water_surface_height_uncertainty": 0.1566
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 5, 
+      "satellite_cycle_number": 31, 
+      "time": 2018.38887747, 
+      "water_surface_height_above_reference_datum": 353.3252, 
+      "water_surface_height_uncertainty": 0.087
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 32, 
+      "time": 2018.46285008, 
+      "water_surface_height_above_reference_datum": 353.2208, 
+      "water_surface_height_uncertainty": 0.1982
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 33, 
+      "time": 2018.53682268, 
+      "water_surface_height_above_reference_datum": 355.9958, 
+      "water_surface_height_uncertainty": 0.1293
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 34, 
+      "time": 2018.61079528, 
+      "water_surface_height_above_reference_datum": 358.8153, 
+      "water_surface_height_uncertainty": 0.0963
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 5, 
+      "satellite_cycle_number": 35, 
+      "time": 2018.68476788, 
+      "water_surface_height_above_reference_datum": 363.908, 
+      "water_surface_height_uncertainty": 0.513
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 5, 
+      "satellite_cycle_number": 36, 
+      "time": 2018.75874049, 
+      "water_surface_height_above_reference_datum": 364.3667, 
+      "water_surface_height_uncertainty": 0.5359
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 5, 
+      "satellite_cycle_number": 37, 
+      "time": 2018.83271309, 
+      "water_surface_height_above_reference_datum": 362.5667, 
+      "water_surface_height_uncertainty": 0.6965
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 5, 
+      "satellite_cycle_number": 38, 
+      "time": 2018.90668569, 
+      "water_surface_height_above_reference_datum": 356.2229, 
+      "water_surface_height_uncertainty": 0.1795
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 5, 
+      "satellite_cycle_number": 39, 
+      "time": 2018.9806583, 
+      "water_surface_height_above_reference_datum": 355.1008, 
+      "water_surface_height_uncertainty": 0.1337
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 4, 
+      "satellite_cycle_number": 40, 
+      "time": 2019.0546309, 
+      "water_surface_height_above_reference_datum": 354.5242, 
+      "water_surface_height_uncertainty": 0.0431
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 3, 
+      "satellite_cycle_number": 41, 
+      "time": 2019.1286035, 
+      "water_surface_height_above_reference_datum": 353.9257, 
+      "water_surface_height_uncertainty": 0.024
+    }, 
+    {
+      "identifier": "L_kainji2",
+      "number_of_observations": 3, 
+      "satellite_cycle_number": 42, 
+      "time": 2019.2025761, 
+      "water_surface_height_above_reference_datum": 353.7485, 
+      "water_surface_height_uncertainty": 0.0484
+    }
+  ], 
+  "geometry": {
+    "coordinates": [
+                    4.70,
+                    10.70
+    ], 
+    "type": "Point"
+  }, 
+  "properties": {
+    "archive_facility": "CLS", 
+    "basin": "Niger", 
+    "comment": "#\n# Timeseries specified by LEGOS and computed by CLS on behalf of CNES\n# water height from satellite altimetry : s3a Track 515\n# Applied corrections : solid earth tide, pole tide, ionospheric delay\n#                       wet and dry tropospheric delay\n# The heights are computed above a geoid given in the header (ref, ref_value (m))\n# The bias between the altimetry missions (using OCOG retracking) and the WGS84 ellipsoid are indicative:\n# ENVISAT : 1.04 m\n# JASON-2 : 0.563 m\n# SARAL : 0.25 m\n# Distance to the sea : 3753.48 km\n#\n#\n# Data Description\n# time = Decimal year\n# water_surface_height_above_reference_datum = height above surface of reference in meters\n# water_surface_height_uncertainty = standard deviation from height in meters\n# number_of_observations = number of high frequency measurements to compute the height\n# satellite_cycle_number = satellite cycle number\n#\n# undef values=9999.999\n#\n", 
+    "contacts": "Helpdesk: http://hydroweb.theia-land.fr/hydroweb/guide?lang=en \n Accountable contact: contact.hydroweb@cls.fr \n Owner contact: hydroweb.theia-land@cnes.fr", 
+    "copyright": "Hydroweb 2018", 
+    "country": "Guinea", 
+    "credit": "Timeseries specified by LEGOS and computed by CLS on behalf of CNES", 
+    "gcmd_keywords": "TERRESTRIAL HYDROSPHERE, SURFACE WATER", 
+    "gemet_keywords": "water level, water management, hydrometry, hydrology, climate, seasonal variation, environmental data, environmental monitoring, monitoring, remote sensing", 
+    "inspire_theme": "Hydrography", 
+    "institution": "LEGOS, CLS, CNES", 
+    "iso19115_topic_categories": "elevation,inlandWaters", 
+    "long_name": "Lake and River Water Level", 
+    "missing_value": 9999.999, 
+    "platform": "SENTINEL3A", 
+    "processing_level": "LEVEL3B", 
+    "processing_mode": "Near Real Time", 
+    "purpose": "To be completed...", 
+    "references": "http://hydroweb.theia-land.fr", 
+    "resource": "L_kainji2",
+    "resource_mimetype": "application/json", 
+    "river": "Tinkisso", 
+    "satellite_pass_number": "515", 
+    "source": "Derived from satellite altimetry", 
+    "status": "operational", 
+    "time_coverage_end": "2019-03-15 22:34:00", 
+    "time_coverage_start": "2016-05-23 22:34:00", 
+    "water_surface_reference_datum_altitude": 32.9039, 
+    "water_surface_reference_name": "EGM2008"
+  }, 
+  "type": "Feature"
+}

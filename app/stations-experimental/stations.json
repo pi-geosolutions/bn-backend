@@ -1,0 +1,118 @@
+{
+    "type": "FeatureCollection",
+    "totalResults": null,
+    "properties": {
+    },
+    "features": [
+        {
+            "type": "Feature",
+            "id": "82490227-73b9-5dce-93ef-75e718dbaff22",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    4.70,
+                    10.70
+                ]
+            },
+            "properties": {
+                "collection": "hydroweb-experimental",
+                "productIdentifier": "L_kainji2",
+                "startDate": "1992-11-18T01:55:00Z",
+                "completionDate": "2019-03-29T01:45:00Z",
+                "keywords": [
+                    {
+                        "name": "nigeria",
+                        "id": "country:nigeria",
+                        "value": 100
+                    },
+                    {
+                        "name": "afrique",
+                        "id": "continent:africa"
+                    },
+                    {
+                        "name": "1992",
+                        "id": "year:1992"
+                    },
+                    {
+                        "name": "1992-11",
+                        "id": "month:1992-11"
+                    },
+                    {
+                        "name": "1992-11-18",
+                        "id": "day:1992-11-18"
+                    },
+                    {
+                        "name": "Niger",
+                        "id": "basin:Niger"
+                    },
+                    {
+                        "name": "operational",
+                        "id": "status:operational"
+                    }
+                ],
+                "status": "operational",
+                "country": "Nigeria",
+                "river": null,
+                "lake": "kainji",
+                "basin": "Niger"
+            }
+        },
+        {
+            "type": "Feature",
+            "id": "16b0e321-7afd-51ce-a938-3908880981b72",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    7.20,
+                    8.50
+                ]
+            },
+            "properties": {
+                "collection": "hydroweb-experimental",
+                "productIdentifier": "R_nig_ben_jas_0020_012",
+                "startDate": "2008-07-12T19:33:00Z",
+                "completionDate": "2019-04-03T11:52:00Z",
+                "keywords": [
+                    {
+                        "name": "nigeria",
+                        "id": "country:nigeria",
+                        "value": 100
+                    },
+                    {
+                        "name": "afrique",
+                        "id": "continent:africa"
+                    },
+                    {
+                        "name": "2008",
+                        "id": "year:2008"
+                    },
+                    {
+                        "name": "2008-07",
+                        "id": "month:2008-07"
+                    },
+                    {
+                        "name": "2008-07-12",
+                        "id": "day:2008-07-12"
+                    },
+                    {
+                        "name": "JASON2/JASON3",
+                        "id": "platform:JASON2/JASON3"
+                    },
+                    {
+                        "name": "Niger",
+                        "id": "basin:Niger"
+                    },
+                    {
+                        "name": "operational",
+                        "id": "status:operational"
+                    }
+                ],
+                "status": "operational",
+                "country": "Nigeria",
+                "river": "Benoue",
+                "lake": null,
+                "basin": "Niger"
+            }
+        }
+    ]
+}
