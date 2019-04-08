@@ -8,7 +8,7 @@ class BaseConfig(object):
     TESTING = False
     # sqlite :memory: identifier is the default if no filepath is present
     LOGGING_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    LOGGING_LOCATION = 'log'
+    LOGGING_LOCATION = 'app.log'
     LOGGING_LEVEL = logging.DEBUG
     CACHE_TYPE = 'simple'
     COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml',

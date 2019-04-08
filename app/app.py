@@ -7,12 +7,11 @@ from flask import Flask
 
 from config import configure_app
 
-log = logging.getLogger()
-
 
 class DataSource(Enum):
     WEB = 1
     LOCAL = 2
+
 
 sources = [
     {
