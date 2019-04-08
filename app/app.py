@@ -2,31 +2,23 @@
 
 import logging
 from enum import Enum
+import configs
+import os
 
 from flask import Flask
 
 from config import configure_app
 
 
-class DataSource(Enum):
-    WEB = 1
-    LOCAL = 2
+def load_sources_from_config_file(path):
+    c = configs.load(path)
+    srcs = []
+    for s in c['sources']:
+        srcs.append(c[s].dict_props)
+    return srcs
 
-
-sources = [
-    {
-        'name': 'theia-hydroweb',
-        'resource-type': DataSource.WEB,
-        'list_uri': 'http://hydroweb.theia-land.fr/hydroweb/search?_m=light&lang=fr&basin=Niger&lake=&river=&status=&box=&q=',
-        'details_uri': 'http://hydroweb.theia-land.fr/hydroweb/authdownload?products={id}&user=theia-user@mydomain.org&pwd=mypasswd&format=json'
-    },
-    {
-        'name': 'experimental',
-        'resource-type': DataSource.LOCAL,
-        'list_uri': 'stations-experimental/stations.json',
-        'details_uri': 'stations-experimental/{id}.json',
-    }
-]
 
 app = Flask(__name__)
 configure_app(app)
+path = app.config['SOURCES_CONFIG_FILE']
+sources = load_sources_from_config_file(path)

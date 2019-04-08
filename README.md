@@ -21,6 +21,19 @@ http://localhost:5000/services/station/theia-hydroweb/R_nig_tin_s3a_0515_00
 Configuration of the sources is, for now, done in app/app.py in the sources object. 
 Data is returned as JSON data
 
+## Configure data sources
+Data sources are, by default, configured in the sources.ini file. You will have to adjust the user and password 
+definitions int the theia-hydroweb details_uri
+
+You can use your own sources definition file by providing the path with the SOURCES_CONFIG_FILE environment variable. 
+For example, using docker, you can mount the file as a volume and provide the corresponding path using the environment 
+variable : 
+`docker run -p 5000:5000 -it  -v /tmp/sources.ini:/sources.ini -e SOURCES_CONFIG_FILE="/sources.ini" pigeosolutions/bn-backend`
+This even allows you to use secrets for your data sources file (best way to protect the authentication params)
+
+## Override configuration
+You can override the app's configuration by pointing the env. var FLASK_CONFIG_FILE_PATH to your own configuration file.
+
 ## Dev setup
 
 ### Set-up python environment

@@ -18,6 +18,7 @@ class BaseConfig(object):
     SUPPORTED_LANGUAGES = {'en': 'English', 'fr': 'Francais'}
     BABEL_DEFAULT_LOCALE = 'en'
     BABEL_DEFAULT_TIMEZONE = 'UTC'
+    SOURCES_CONFIG_FILE = 'source.ini'
 
 
 class DevelopmentConfig(BaseConfig):
@@ -50,6 +51,14 @@ def configure_app(app):
     config_name = os.getenv('FLASK_CONFIGURATION', 'default')
     app.config.from_object(config[config_name])
     app.config.from_pyfile('config.cfg', silent=True)
+    # Allow override config file path using env var
+    app.config.from_envvar('FLASK_CONFIG_FILE_PATH', silent=True)
+
+    # Allow defining the source file from environment variable directly (bypassing the config)
+    sourcepath = os.getenv('SOURCES_CONFIG_FILE')
+    if sourcepath:
+        app.config['SOURCES_CONFIG_FILE'] = sourcepath
+
     # Configure logging
     handler = logging.FileHandler(app.config['LOGGING_LOCATION'])
     handler.setLevel(app.config['LOGGING_LEVEL'])
