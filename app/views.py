@@ -21,23 +21,61 @@ def index():
     return ''
 
 
-#TODO: add source name in the stations list so we can build the station/XXX request
-@app.route('/services/stations')
-def stationslist():
-    json_all = []
-    for src in sources:
+@app.route('/api/v1/sources')
+def list_sources():
+    """
+    Get the list of available sources
+    :return: sources list
+    """
+    return jsonify(sources)
+
+
+@app.route('/api/v1/sources/<source_id>')
+def get_source(source_id):
+    """
+    Get definition for given source id
+    :param source_id:
+    :return: source definition for the matching id
+    """
+    source = sources[source_id]
+    return jsonify(source)
+
+
+@app.route('/api/v1/sources/<source_id>/stations')
+def list_stations(source_id):
+    """
+    Get stations for given data source id
+    :param source_id:
+    :return: list of station objects
+    """
+    src = sources[source_id]
+    json_content = resource_as_json( src['list_uri'])
+    #json_content['properties']['source_name'] = src['name']
+    return jsonify(json_content)
+
+
+
+@app.route('/api/v1/sources/<source_id>/stations/<station_id>')
+def get_stations(source_id, station_id):
+    """
+    Get station definition for given data source id
+    :param source_id:
+    :param station_id: the id given in productIdentifier field
+    :return: station object. If ?scope=data parameter is provided, returns the stations altimetric data
+    """
+    src = sources[source_id]
+    scope = request.args.get('scope')
+    if scope == 'data':
+        # Extract the proper details URL
+        uri = src['details_uri'].format(id=station_id)
+        return jsonify(resource_as_json(uri))
+    else:
+        # not dealt with => back to default behaviour
+        scope = ''
+    if not scope:
+        # default behaviour
         json_content = resource_as_json( src['list_uri'])
-        json_content['properties']['source_name'] = src['name']
-        json_all.append(json_content)
-    return jsonify(json_all)
-
-
-@app.route('/services/station/<source_name>/<station_id>', methods=['GET', 'POST'])
-def station(source_name, station_id):
-    # Find the matching source
-    src = next((d for (index, d) in enumerate(sources) if d["name"] == source_name), None)
-    if not src:
-        abort(404)
-    # Extract the proper details URL
-    uri = src['details_uri'].format(id=station_id)
-    return jsonify(resource_as_json(uri))
+        #json_content['properties']['source_name'] = src['name']
+        station_feature = next((d for (index, d) in enumerate(json_content['features']) if d["properties"]["productIdentifier"] == station_id), None)
+        json_content['features'] = [station_feature]
+        return jsonify(json_content)

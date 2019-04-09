@@ -12,9 +12,11 @@ from config import configure_app
 
 def load_sources_from_config_file(path):
     c = configs.load(path)
-    srcs = []
+    srcs = dict()
     for s in c['sources']:
-        srcs.append(c[s].dict_props)
+        props = c[s].dict_props
+        props['id'] = s
+        srcs[s] = props
     return srcs
 
 

@@ -1,25 +1,20 @@
 # bn-backend
 Simple backend intended to serve the stations data for bassin-niger frontend app (https://github.com/fgravin/bassin-niger)
 
-##Services 
+## API
 
-Retrieve list of stations and their position:
-```
-http://localhost:5000/services/stations
-```
-
-Retrieve water elevation values for station L_kainji2 (experimental source)
-```
-http://localhost:5000/services/station/experimental/L_kainji2
-```
-
-Retrieve water elevation values for station R_nig_tin_s3a_0515_00 (theia-hydroweb source)
-```
-http://localhost:5000/services/station/theia-hydroweb/R_nig_tin_s3a_0515_00
-```
-
-Configuration of the sources is, for now, done in app/app.py in the sources object. 
 Data is returned as JSON data
+
+**/api/v1/sources**: get the list of available sources
+
+**/api/v1/sources/<source_id>**: get definition of the source matching the given id
+
+**/api/v1/sources/<source_id>/stations**: get the list of stations for given data source id
+
+**/api/v1/sources/<source_id>/stations/<station_id>**: get station definition for given data source id and station id. 
+station_id is given by the `productIdentifier` field in the station definition
+
+**/api/v1/sources/<source_id>/stations/<station_id>?scope=data**: get the station's altimetric data (historical data)
 
 ## Configure data sources
 Data sources are, by default, configured in the sources.ini file. You will have to adjust the user and password 
