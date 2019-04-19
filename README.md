@@ -44,6 +44,7 @@ pip install -r requirements.txt
 
 ### Run
 `python app/main.py`
+Then open http://localhost:5000/api/v1/sources
 
 ### Build docker image
 `docker build . -t pigeosolutions/bn-backend`
