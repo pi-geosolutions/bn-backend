@@ -1,6 +1,7 @@
 # encoding: utf-8
 # Helpers for parsing hydroweb files
 
+import os
 from dateutil import parser
 
 def txt2geojson(path, with_data=False):
@@ -27,10 +28,54 @@ def txt2geojson(path, with_data=False):
 
         feature['properties']['startDate'] = data[0].get('date_iso')
         feature['properties']['completionDate'] = data[-1].get('date_iso')
+        # get the file name as ID
+        id = os.path.splitext(os.path.basename(path))[0]
+        feature['properties']['productIdentifier'] = id
+        feature['id'] = id
         if not with_data:
             return feature
 
     return None
+
+
+def txt2data_vectors(path):
+    """
+    Produces a dict containing 2 vectors (list) of values : dates & water height
+    :param path: file path
+    :return:
+    """
+    data = txt2array(path)
+    x, y = zip(*data)
+    return {
+        'dates': x,
+        'h': y
+    }
+
+
+def txt2array(path):
+    '''
+    Convert data from hydroweb TXT format to numpy array (for graphs)
+    Processes data only
+    :param path:
+    :return: list of (time, value) tuples
+    '''
+    #TODO: check if we get performance improvement using numpy.fromregex to read from file
+    with open(path) as file:
+        # drop header (first line)
+        line = file.readline()
+
+        # parse the rest
+        line = file.readline()
+        data = []
+        while line:
+            if not line.lstrip().startswith('#'):
+                line_data = _txt_parse_line_data(line)
+                data.append((line_data['date_iso'],
+                             float(line_data['water_surface_height_above_reference_datum'])
+                             )
+                            )
+            line = file.readline()
+    return data
 
 
 def _txt_parse_header(line):
@@ -62,7 +107,7 @@ def _txt_header_to_geojson_feature(line):
             },
             'properties': {
                 'collection': 'research_stations',
-                'productIdentifier': header_as_dict.get('station', ''),
+                'name': header_as_dict.get('station', ''),
                 'startDate': '',
                 'completionDate': '',
                 'status': header_as_dict.get('type'),
@@ -95,7 +140,7 @@ def _txt_parse_line_data(line):
     entries = line.split(';')
     data = {
         'time' : entries[0].strip(),
-        'date_iso' : '{} {}:00Z'.format(entries[1].strip(), entries[2].strip()),
+        'date_iso' : '{} {}'.format(entries[1].strip(), entries[2].strip()),
         'water_surface_height_above_reference_datum': entries[3].strip(),
         'water_surface_height_uncertainty': entries[4].strip(),
         'number_of_observations': entries[5].strip(),

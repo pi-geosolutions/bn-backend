@@ -3,6 +3,8 @@
 import requests
 import json
 
+import utils.parsing as parsing
+
 from flask import Flask, abort, request, jsonify, current_app
 
 from app import app, sources
@@ -16,6 +18,15 @@ def resource_as_json(uri):
         with open(uri) as json_file:
             json_local = json.load(json_file)
             return json_local
+
+
+def data_as_json(uri):
+    if uri.startswith("http"):
+        r = requests.get(uri)
+        current_app.logger.debug(r.status_code)
+        return r.json()
+    else: # we assume it is local path
+        return parsing.txt2data_vectors(uri)
 
 
 @app.route('/')
@@ -70,7 +81,7 @@ def get_stations(source_id, station_id):
     if scope == 'data':
         # Extract the proper details URL
         uri = src['details_uri'].format(id=station_id)
-        return jsonify(resource_as_json(uri))
+        return jsonify(data_as_json(uri))
     else:
         # not dealt with => back to default behaviour
         scope = ''
@@ -80,4 +91,5 @@ def get_stations(source_id, station_id):
         #json_content['properties']['source_name'] = src['name']
         station_feature = next((d for (index, d) in enumerate(json_content['features']) if d["properties"]["productIdentifier"] == station_id), None)
         json_content['features'] = [station_feature]
+        json_content['totalResults']=1
         return jsonify(json_content)
