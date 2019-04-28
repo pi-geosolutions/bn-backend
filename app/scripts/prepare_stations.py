@@ -1,8 +1,10 @@
 # encoding: utf-8
 
 '''
-Reads the source configuration, scans the stations and produces the stations list in geojson format,
-similar to http://hydroweb.theia-land.fr/hydroweb/search?_m=light&lang=fr&basin=Niger&lake=&river=&status=&box=&q=
+Reads the source configuration from app configuration,
+retrieves the stations list for each source,
+downloads the stations data locally for web resources,
+produces the png thumbnails.
 '''
 
 import logging
@@ -10,6 +12,8 @@ import argparse
 import glob
 import json
 import numpy
+import requests
+import urllib.request
 from os import path, makedirs
 from matplotlib import pyplot, dates as mdates
 from datetime import datetime
@@ -20,6 +24,9 @@ from app import app
 from utils import io_utils, parsing
 
 logger = logging.getLogger()
+
+STORAGE_PATH='/mnt/data'
+FORCE_UPDATE = True
 
 def main():
     # Input arguments
@@ -37,8 +44,8 @@ def main():
                         action='store_true')
     parser.add_argument('-t', '--thumbnails', help='generate stations graph thumbnails',
                         action='store_true')
-    parser.add_argument('sources_ini_path', help='the path to the sources.ini file (the one containing the config of the sources')
-    parser.add_argument('source_name', help='the source name to process')
+    parser.add_argument('--storage_path',
+                        help='Where the generatd files will be stored (root folder). Defaults to /mnt/data')
 
     args = parser.parse_args()
 
@@ -59,24 +66,67 @@ def main():
 
     logger.info(app.sources)
 
-    srcs = io_utils.load_sources_from_config_file(args.sources_ini_path)
-    try:
-        src = srcs[args.source_name]
-    except KeyError as e:
-        logger.error('Data source {0} missing in {1}'.format(args.source_name, args.sources_ini_path))
+    if args.storage_path:
+        STORAGE_PATH = args.storage_path
 
-    files = glob.glob(src['details_uri'].replace('{id}', '*'))
+    srcs = app.sources
 
+    for src_name, src in srcs.items():
+        prepare_stations_for_source(src)
+
+
+
+def prepare_stations_for_source(src):
+    """
+    Reads the source configuration from app configuration,
+    retrieves the stations list for this source,
+    downloads the stations data locally for web resources,
+    re-creates the stations list (for consistency between local and remote source)
+    produces the png thumbnails.
+    :param src:
+    :return:
+    """
+    src['paths'] = {
+        'src_folder': path.join(STORAGE_PATH, 'sources', src['id']),
+        'stations_folder': path.join(STORAGE_PATH, 'sources', src['id'], 'stations'),
+        'txt_folder': path.join(STORAGE_PATH, 'sources', src['id'], 'stations', 'txt'),
+        'png_folder': path.join(STORAGE_PATH, 'sources', src['id'], 'stations', 'thumbnails'),
+    }
+    # make sure the folders exist
+    for k, v in src['paths'].items():
+        if k.endswith('_folder'):
+            makedirs(v, exist_ok=True)
+
+    if src['list_uri'].startswith("http"):
+        r = requests.get(src['list_uri'])
+        _retrieve_stations_data(src, r.json())
+
+    files = glob.glob(path.join(src['paths']['txt_folder'], '*.txt'))
     # create the stations list in geojson format,
-    if args.list:
-        _generate_stations_list(src, files)
+    _generate_stations_list(src, files)
 
     # generate graph thumbnails
-    if args.thumbnails:
-        _generate_thumbnails(src, files)
+    _generate_thumbnails(src, files)
 
 
-    logger.debug(args.source_name)
+def _retrieve_stations_data(src, stations_list):
+    """
+    Downloads the data files for each station of this data source and stores it locally for further use
+    :param src:
+    :param stations_list:
+    :return:
+    """
+    dest_folder = src['paths']['txt_folder']
+    for f in stations_list['features']:
+        url = src['details_uri'].format(id=f['properties']['productIdentifier'])
+        dest_file = path.join(dest_folder, f['properties']['productIdentifier']+'.txt')
+
+        if not FORCE_UPDATE:
+            # don't re-download the file if already present on the disk
+            if path.exists(dest_file):
+                continue
+        urllib.request.urlretrieve(url, dest_file)
+
 
 
 def _generate_stations_list(src, files_list):
@@ -85,6 +135,7 @@ def _generate_stations_list(src, files_list):
         try:
             line_as_feature = parsing.txt2geojson(file)
             line_as_feature['properties']['thumbnail'] = _get_thumbnail_file_name(src, file)
+            line_as_feature['properties']['collection'] = src.get('name')
             features.append(line_as_feature)
         except parsing.HydrowebParsingError as e:
             logger.error('failed while extracting header information for hydroweb TXT file {}. {}'.format(file, e))
@@ -96,7 +147,8 @@ def _generate_stations_list(src, files_list):
         'features': features
     }
 
-    with open(src['list_uri'], 'w') as outfile:
+    filename = path.join(src['paths']['stations_folder'], 'stations.json')
+    with open(filename, 'w') as outfile:
         json.dump(stations_list, outfile, indent=2, sort_keys=False)
 
 
@@ -133,7 +185,9 @@ def _generate_thumbnails(src, files_list):
             ax.spines['left'].set_visible(True)
             ax.plot_date(a_x, a_y, fmt='b-', xdate=True, ydate=False, linewidth=0.5)
 
-            fig.savefig(_get_thumbnail_file_name(src, file))
+            filename = '{}.png'.format(path.splitext(path.basename(file))[0])
+            filepath = path.join(src['paths']['png_folder'], filename)
+            fig.savefig(filepath)
             pyplot.close(fig)
             #fig.show()
             logger.debug("processed station {}".format(file))

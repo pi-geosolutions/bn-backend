@@ -4,7 +4,7 @@
 import os
 from dateutil import parser
 
-def txt2geojson(path, with_data=False):
+def txt2geojson(path):
     '''
     Convert data from hydroweb TXT format to geojson
     :param path:
@@ -13,6 +13,7 @@ def txt2geojson(path, with_data=False):
     with open(path) as file:
         # read header (first line)
         line = file.readline()
+
         feature = _txt_header_to_geojson_feature(line)
 
         # parse the rest
@@ -32,10 +33,7 @@ def txt2geojson(path, with_data=False):
         id = os.path.splitext(os.path.basename(path))[0]
         feature['properties']['productIdentifier'] = id
         feature['id'] = id
-        if not with_data:
-            return feature
-
-    return None
+        return feature
 
 
 def txt2data_vectors(path):
@@ -94,6 +92,13 @@ def _txt_header_to_geojson_feature(line):
     :return:
     '''
     header_as_dict = _txt_parse_header(line)
+    # TODO: reduce code redundancy here. Better would be to harmonize formats, see if hydroweb would change it for next version.
+    if line.startswith('lake'):
+        return _lake_header_to_geojson_feature(header_as_dict)
+    else:
+        return _station_header_to_geojson_feature(header_as_dict)
+
+def _station_header_to_geojson_feature(header_as_dict):
     try:
         feature = {
             'type': 'Feature',
@@ -106,7 +111,6 @@ def _txt_header_to_geojson_feature(line):
                 ]
             },
             'properties': {
-                'collection': 'research_stations',
                 'name': header_as_dict.get('station', ''),
                 'startDate': '',
                 'completionDate': '',
@@ -115,6 +119,45 @@ def _txt_header_to_geojson_feature(line):
                 'river': header_as_dict.get('river'),
                 'lake': header_as_dict.get('lake'),
                 'basin': header_as_dict.get('basin'),
+                'type': header_as_dict.get('type'),
+            }
+        }
+        date = header_as_dict.get('date')
+        try:
+            completionDate = parser.parse(date)
+            feature['properties']['completionDate'] = completionDate
+        except:
+            print('date format invalid')
+    except KeyError as e:
+        print('failed while extracting header information for hydroweb TXT file. {}'.format(e))
+        raise HydrowebParsingError(
+            'failed while extracting header information for hydroweb TXT file. {}'.format(e)) from e
+    return feature
+
+
+def _lake_header_to_geojson_feature(header_as_dict):
+    try:
+        feature = {
+            'type': 'Feature',
+            'id': header_as_dict['lake'],
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [
+                    header_as_dict['lat'],
+                    header_as_dict['lon'],
+                ]
+            },
+            'properties': {
+                'collection': 'research_stations',
+                'name': header_as_dict.get('lake', ''),
+                'startDate': '',
+                'completionDate': '',
+                'status': header_as_dict.get('type'),
+                'country': header_as_dict.get('river'),
+                'river': header_as_dict.get('river'),
+                'lake': header_as_dict.get('lake'),
+                'basin': header_as_dict.get('basin'),
+                'type': header_as_dict.get('type'),
             }
         }
         date = header_as_dict.get('date')

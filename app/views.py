@@ -29,9 +29,48 @@ def data_as_json(uri):
         return parsing.txt2data_vectors(uri)
 
 
+def _resource_get(src, res, id=''):
+    """
+    Get the resource (res) locally if possible.
+    :param src: source definition
+    :param res: the resource to get
+    :return:
+    """
+    if res == 'list':
+        # TODO: this is hardcoded path #DIRTY. Fix this
+        uri = '/mnt/data/sources/'+src['id']+'/stations/stations.json'
+        with open(uri) as json_file:
+            json_local = json.load(json_file)
+            return json_local
+    elif res == 'data':
+        # TODO error-check if id doesn't exist
+        uri = '/mnt/data/sources/'+src['id']+'/stations/txt/{id}.txt'.format(id=id)
+        return parsing.txt2data_vectors(uri)
+
+
 @app.route('/')
 def index():
     return ''
+
+
+
+@app.route('/api/v1/stations')
+def list_all_stations():
+    """
+    Concatenates the list of stations from all sources and return it as geojson
+    :return:
+    """
+    features = []
+    for src_name, src in sources.items():
+        json_content = _resource_get(src, 'list')
+        features.extend(json_content['features'])
+    l = {
+        'type': 'FeatureCollection',
+        'properties': {},
+        'totalResults': len(features),
+        'features': features
+    }
+    return jsonify(l)
 
 
 @app.route('/api/v1/sources')
@@ -62,7 +101,7 @@ def list_stations(source_id):
     :return: list of station objects
     """
     src = sources[source_id]
-    json_content = resource_as_json( src['list_uri'])
+    json_content = _resource_get(src, 'list')
     #json_content['properties']['source_name'] = src['name']
     return jsonify(json_content)
 
@@ -79,15 +118,14 @@ def get_stations(source_id, station_id):
     src = sources[source_id]
     scope = request.args.get('scope')
     if scope == 'data':
-        # Extract the proper details URL
-        uri = src['details_uri'].format(id=station_id)
-        return jsonify(data_as_json(uri))
+        json_content = _resource_get(src, 'data', station_id)
+        return jsonify(json_content)
     else:
         # not dealt with => back to default behaviour
         scope = ''
     if not scope:
         # default behaviour
-        json_content = resource_as_json( src['list_uri'])
+        json_content = _resource_get(src, 'list')
         #json_content['properties']['source_name'] = src['name']
         station_feature = next((d for (index, d) in enumerate(json_content['features']) if d["properties"]["productIdentifier"] == station_id), None)
         json_content['features'] = [station_feature]
