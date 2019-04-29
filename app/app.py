@@ -3,11 +3,10 @@
 from flask import Flask
 
 
-from config import configure_app
-from utils import io_utils
+from config import configure_app, load_sources_from_config_file
 
 
 app = Flask(__name__)
 configure_app(app)
 path = app.config['SOURCES_CONFIG_FILE']
-sources = io_utils.load_sources_from_config_file(path)
+sources = load_sources_from_config_file(path)

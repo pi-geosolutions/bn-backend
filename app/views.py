@@ -6,50 +6,13 @@ import json
 import utils.parsing as parsing
 
 from flask import Flask, abort, request, jsonify, current_app
-from flask_cors import CORS
+#from flask_cors import CORS
 
 from app import app, sources
+from utils import io_utils
 
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-
-def resource_as_json(uri):
-    if uri.startswith("http"):
-        r = requests.get(uri)
-        current_app.logger.debug(r.status_code)
-        return r.json()
-    else: # we assume it is local path
-        with open(uri) as json_file:
-            json_local = json.load(json_file)
-            return json_local
-
-
-def data_as_json(uri):
-    if uri.startswith("http"):
-        r = requests.get(uri)
-        current_app.logger.debug(r.status_code)
-        return r.json()
-    else: # we assume it is local path
-        return parsing.txt2data_vectors(uri)
-
-
-def _resource_get(src, res, id=''):
-    """
-    Get the resource (res) locally if possible.
-    :param src: source definition
-    :param res: the resource to get
-    :return:
-    """
-    if res == 'list':
-        # TODO: this is hardcoded path #DIRTY. Fix this
-        uri = '/mnt/data/sources/'+src['id']+'/stations/stations.json'
-        with open(uri) as json_file:
-            json_local = json.load(json_file)
-            return json_local
-    elif res == 'data':
-        # TODO error-check if id doesn't exist
-        uri = '/mnt/data/sources/'+src['id']+'/stations/txt/{id}.txt'.format(id=id)
-        return parsing.txt2data_vectors(uri)
+#cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+# TODO: pip install flask_cors
 
 
 @app.route('/')
@@ -66,7 +29,7 @@ def list_all_stations():
     """
     features = []
     for src_name, src in sources.items():
-        json_content = _resource_get(src, 'list')
+        json_content = io_utils.resource_get(src, 'list')
         features.extend(json_content['features'])
     l = {
         'type': 'FeatureCollection',
@@ -105,7 +68,7 @@ def list_stations(source_id):
     :return: list of station objects
     """
     src = sources[source_id]
-    json_content = _resource_get(src, 'list')
+    json_content = io_utils.resource_get(src, 'list')
     #json_content['properties']['source_name'] = src['name']
     return jsonify(json_content)
 
@@ -122,14 +85,14 @@ def get_stations(source_id, station_id):
     src = sources[source_id]
     scope = request.args.get('scope')
     if scope == 'data':
-        json_content = _resource_get(src, 'data', station_id)
+        json_content = io_utils.resource_get(src, 'data', station_id)
         return jsonify(json_content)
     else:
         # not dealt with => back to default behaviour
         scope = ''
     if not scope:
         # default behaviour
-        json_content = _resource_get(src, 'list')
+        json_content = io_utils.resource_get(src, 'list')
         #json_content['properties']['source_name'] = src['name']
         station_feature = next((d for (index, d) in enumerate(json_content['features']) if d["properties"]["productIdentifier"] == station_id), None)
         json_content['features'] = [station_feature]

@@ -106,8 +106,8 @@ def _station_header_to_geojson_feature(header_as_dict):
             'geometry': {
                 'type': 'Point',
                 'coordinates': [
-                    header_as_dict['lat'],
-                    header_as_dict['lon'],
+                    float(header_as_dict['lon']),
+                    float(header_as_dict['lat']),
                 ]
             },
             'properties': {

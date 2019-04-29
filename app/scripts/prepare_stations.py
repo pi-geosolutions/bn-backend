@@ -25,8 +25,7 @@ from utils import io_utils, parsing
 
 logger = logging.getLogger()
 
-STORAGE_PATH='/mnt/data'
-FORCE_UPDATE = True
+FORCE_UPDATE = False
 
 def main():
     # Input arguments
@@ -64,11 +63,6 @@ def main():
         loglevel = logging.DEBUG
     logger.setLevel(loglevel)
 
-    logger.info(app.sources)
-
-    if args.storage_path:
-        STORAGE_PATH = args.storage_path
-
     srcs = app.sources
 
     for src_name, src in srcs.items():
@@ -86,22 +80,17 @@ def prepare_stations_for_source(src):
     :param src:
     :return:
     """
-    src['paths'] = {
-        'src_folder': path.join(STORAGE_PATH, 'sources', src['id']),
-        'stations_folder': path.join(STORAGE_PATH, 'sources', src['id'], 'stations'),
-        'txt_folder': path.join(STORAGE_PATH, 'sources', src['id'], 'stations', 'txt'),
-        'png_folder': path.join(STORAGE_PATH, 'sources', src['id'], 'stations', 'thumbnails'),
-    }
+
     # make sure the folders exist
-    for k, v in src['paths'].items():
-        if k.endswith('_folder'):
+    for k, v in io_utils.paths.items():
+        if k.endswith('.folder'):
             makedirs(v, exist_ok=True)
 
     if src['list_uri'].startswith("http"):
         r = requests.get(src['list_uri'])
         _retrieve_stations_data(src, r.json())
 
-    files = glob.glob(path.join(src['paths']['txt_folder'], '*.txt'))
+    files = glob.glob(io_utils.paths['stations.data'].format(source_id=src['id'], station_id='*'))
     # create the stations list in geojson format,
     _generate_stations_list(src, files)
 
@@ -116,10 +105,12 @@ def _retrieve_stations_data(src, stations_list):
     :param stations_list:
     :return:
     """
-    dest_folder = src['paths']['txt_folder']
+    dest_folder = io_utils.paths['txt.folder'].format(source_id=src['id'])
     for f in stations_list['features']:
         url = src['details_uri'].format(id=f['properties']['productIdentifier'])
-        dest_file = path.join(dest_folder, f['properties']['productIdentifier']+'.txt')
+        dest_file = io_utils.paths['stations.data'].format(source_id=src['id'],
+                                                           station_id = f['properties']['productIdentifier'])
+        #dest_file = path.join(dest_folder, f['properties']['productIdentifier']+'.txt')
 
         if not FORCE_UPDATE:
             # don't re-download the file if already present on the disk
@@ -147,7 +138,8 @@ def _generate_stations_list(src, files_list):
         'features': features
     }
 
-    filename = path.join(src['paths']['stations_folder'], 'stations.json')
+    filename = io_utils.paths['stations.list'].format(source_id=src['id'])
+    #path.join(io_utils.paths['stations.folder'], 'stations.json')
     with open(filename, 'w') as outfile:
         json.dump(stations_list, outfile, indent=2, sort_keys=False)
 
@@ -186,7 +178,7 @@ def _generate_thumbnails(src, files_list):
             ax.plot_date(a_x, a_y, fmt='b-', xdate=True, ydate=False, linewidth=0.5)
 
             filename = '{}.png'.format(path.splitext(path.basename(file))[0])
-            filepath = path.join(src['paths']['png_folder'], filename)
+            filepath = path.join(io_utils.paths['png.folder'].format(source_id=src['id']), filename)
             fig.savefig(filepath)
             pyplot.close(fig)
             #fig.show()
