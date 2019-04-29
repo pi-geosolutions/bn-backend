@@ -2,6 +2,7 @@
 
 from flask import Flask
 
+
 from config import configure_app
 from utils import io_utils
 

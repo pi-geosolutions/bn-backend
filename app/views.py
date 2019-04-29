@@ -6,8 +6,12 @@ import json
 import utils.parsing as parsing
 
 from flask import Flask, abort, request, jsonify, current_app
+from flask_cors import CORS
 
 from app import app, sources
+
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 
 def resource_as_json(uri):
     if uri.startswith("http"):
