@@ -16,6 +16,8 @@ paths = {
     'stations.list' : path.join('/mnt/data', 'sources', '{source_id}', 'stations', 'stations.json'),
     'stations.data' : path.join('/mnt/data', 'sources', '{source_id}', 'stations', 'txt',
                                 '{station_id}.txt'),
+    'stations.png.url' : path.join('/static', 'sources', '{source_id}', 'stations', 'thumbnails',
+                                '{station_id}.png'),
 }
 
 

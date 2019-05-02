@@ -114,12 +114,12 @@ def _station_header_to_geojson_feature(header_as_dict):
                 'name': header_as_dict.get('station', ''),
                 'startDate': '',
                 'completionDate': '',
-                'status': header_as_dict.get('type'),
-                'country': header_as_dict.get('river'),
-                'river': header_as_dict.get('river'),
-                'lake': header_as_dict.get('lake'),
-                'basin': header_as_dict.get('basin'),
-                'type': header_as_dict.get('type'),
+                'status': header_as_dict.get('type', ''),
+                'country': str(header_as_dict.get('country', '')).capitalize(),
+                'river': str(header_as_dict.get('river', '')).capitalize(),
+                'lake': str(header_as_dict.get('lake', '')).capitalize(),
+                'basin': str(header_as_dict.get('basin', '')).capitalize(),
+                'type': header_as_dict.get('type', ''),
             }
         }
         date = header_as_dict.get('date')
@@ -143,8 +143,8 @@ def _lake_header_to_geojson_feature(header_as_dict):
             'geometry': {
                 'type': 'Point',
                 'coordinates': [
-                    header_as_dict['lat'],
                     header_as_dict['lon'],
+                    header_as_dict['lat'],
                 ]
             },
             'properties': {
@@ -152,12 +152,12 @@ def _lake_header_to_geojson_feature(header_as_dict):
                 'name': header_as_dict.get('lake', ''),
                 'startDate': '',
                 'completionDate': '',
-                'status': header_as_dict.get('type'),
-                'country': header_as_dict.get('river'),
-                'river': header_as_dict.get('river'),
-                'lake': header_as_dict.get('lake'),
-                'basin': header_as_dict.get('basin'),
-                'type': header_as_dict.get('type'),
+                'status': header_as_dict.get('type', ''),
+                'country': str(header_as_dict.get('country', '')).capitalize(),
+                'river': str(header_as_dict.get('river', '')).capitalize(),
+                'lake': str(header_as_dict.get('lake', '')).capitalize(),
+                'basin': str(header_as_dict.get('basin', '')).capitalize(),
+                'type': header_as_dict.get('type', ''),
             }
         }
         date = header_as_dict.get('date')

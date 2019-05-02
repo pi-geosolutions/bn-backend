@@ -84,7 +84,7 @@ def prepare_stations_for_source(src):
     # make sure the folders exist
     for k, v in io_utils.paths.items():
         if k.endswith('.folder'):
-            makedirs(v, exist_ok=True)
+            makedirs(v.format(source_id = src['id']), exist_ok=True)
 
     if src['list_uri'].startswith("http"):
         r = requests.get(src['list_uri'])
@@ -125,7 +125,8 @@ def _generate_stations_list(src, files_list):
     for file in files_list:
         try:
             line_as_feature = parsing.txt2geojson(file)
-            line_as_feature['properties']['thumbnail'] = _get_thumbnail_file_name(src, file)
+            line_as_feature['properties']['thumbnail'] = io_utils.paths['stations.png.url'].format(source_id = src['id'],
+                                                    station_id = line_as_feature['properties']['productIdentifier'])
             line_as_feature['properties']['collection'] = src.get('name')
             features.append(line_as_feature)
         except parsing.HydrowebParsingError as e:
@@ -145,6 +146,7 @@ def _generate_stations_list(src, files_list):
 
 
 def _get_thumbnail_file_name(src, data_file_name, fullpath=True):
+    # TODO: cleanup code. Most of it is not used anymore
     basepath, file_name = path.split(data_file_name)
     fname, fext = path.splitext(file_name)
     if src.get('thumbnails_uri'):
