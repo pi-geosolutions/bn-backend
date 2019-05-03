@@ -22,10 +22,12 @@ from app import app
 
 # local to the module
 from utils import io_utils, parsing
+from utils.io_utils import IoHelper
 
 logger = logging.getLogger()
-
+io_helper = app.io_helper
 FORCE_UPDATE = False
+
 
 def main():
     # Input arguments
@@ -69,7 +71,6 @@ def main():
         prepare_stations_for_source(src)
 
 
-
 def prepare_stations_for_source(src):
     """
     Reads the source configuration from app configuration,
@@ -82,7 +83,7 @@ def prepare_stations_for_source(src):
     """
 
     # make sure the folders exist
-    for k, v in io_utils.paths.items():
+    for k, v in io_helper.paths.items():
         if k.endswith('.folder'):
             makedirs(v.format(source_id = src['id']), exist_ok=True)
 
@@ -90,7 +91,7 @@ def prepare_stations_for_source(src):
         r = requests.get(src['list_uri'])
         _retrieve_stations_data(src, r.json())
 
-    files = glob.glob(io_utils.paths['stations.data'].format(source_id=src['id'], station_id='*'))
+    files = glob.glob(io_helper.paths['stations.data'].format(source_id=src['id'], station_id='*'))
     # create the stations list in geojson format,
     _generate_stations_list(src, files)
 
@@ -105,13 +106,10 @@ def _retrieve_stations_data(src, stations_list):
     :param stations_list:
     :return:
     """
-    dest_folder = io_utils.paths['txt.folder'].format(source_id=src['id'])
     for f in stations_list['features']:
         url = src['details_uri'].format(id=f['properties']['productIdentifier'])
-        dest_file = io_utils.paths['stations.data'].format(source_id=src['id'],
+        dest_file = io_helper.paths['stations.data'].format(source_id=src['id'],
                                                            station_id = f['properties']['productIdentifier'])
-        #dest_file = path.join(dest_folder, f['properties']['productIdentifier']+'.txt')
-
         if not FORCE_UPDATE:
             # don't re-download the file if already present on the disk
             if path.exists(dest_file):
@@ -119,13 +117,12 @@ def _retrieve_stations_data(src, stations_list):
         urllib.request.urlretrieve(url, dest_file)
 
 
-
 def _generate_stations_list(src, files_list):
     features = []
     for file in files_list:
         try:
             line_as_feature = parsing.txt2geojson(file)
-            line_as_feature['properties']['thumbnail'] = io_utils.paths['stations.png.url'].format(source_id = src['id'],
+            line_as_feature['properties']['thumbnail'] = io_helper.paths['stations.png.url'].format(source_id = src['id'],
                                                     station_id = line_as_feature['properties']['productIdentifier'])
             line_as_feature['properties']['collection'] = src.get('name')
             features.append(line_as_feature)
@@ -139,24 +136,9 @@ def _generate_stations_list(src, files_list):
         'features': features
     }
 
-    filename = io_utils.paths['stations.list'].format(source_id=src['id'])
-    #path.join(io_utils.paths['stations.folder'], 'stations.json')
+    filename = io_helper.paths['stations.list'].format(source_id=src['id'])
     with open(filename, 'w') as outfile:
         json.dump(stations_list, outfile, indent=2, sort_keys=False)
-
-
-def _get_thumbnail_file_name(src, data_file_name, fullpath=True):
-    # TODO: cleanup code. Most of it is not used anymore
-    basepath, file_name = path.split(data_file_name)
-    fname, fext = path.splitext(file_name)
-    if src.get('thumbnails_uri'):
-        folder, file_name = path.split(src.get('thumbnails_uri'))
-    else:
-        # we create a sibling folder named 'thumbnails'
-        folder = path.normpath('{}/../thumbnails/'.format(basepath))
-    if not path.exists(folder):
-        makedirs(folder)
-    return '{}/{}.png'.format(folder, fname)
 
 
 def _generate_thumbnails(src, files_list):
@@ -180,7 +162,7 @@ def _generate_thumbnails(src, files_list):
             ax.plot_date(a_x, a_y, fmt='b-', xdate=True, ydate=False, linewidth=0.5)
 
             filename = '{}.png'.format(path.splitext(path.basename(file))[0])
-            filepath = path.join(io_utils.paths['png.folder'].format(source_id=src['id']), filename)
+            filepath = path.join(io_helper.paths['png.folder'].format(source_id=src['id']), filename)
             fig.savefig(filepath)
             pyplot.close(fig)
             #fig.show()

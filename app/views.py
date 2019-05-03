@@ -6,12 +6,12 @@ import json
 import utils.parsing as parsing
 
 from flask import Flask, abort, request, jsonify, current_app
-#from flask_cors import CORS
+from flask_cors import CORS
 
-from app import app, sources
+from app import app, sources, io_helper
 from utils import io_utils
 
-#cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 # TODO: pip install flask_cors
 
 
@@ -29,7 +29,7 @@ def list_all_stations():
     """
     features = []
     for src_name, src in sources.items():
-        json_content = io_utils.resource_get(src, 'list')
+        json_content = io_helper.resource_get(src, 'list')
         features.extend(json_content['features'])
     l = {
         'type': 'FeatureCollection',
@@ -68,7 +68,7 @@ def list_stations(source_id):
     :return: list of station objects
     """
     src = sources[source_id]
-    json_content = io_utils.resource_get(src, 'list')
+    json_content = io_helper.resource_get(src, 'list')
     #json_content['properties']['source_name'] = src['name']
     return jsonify(json_content)
 
@@ -85,14 +85,14 @@ def get_stations(source_id, station_id):
     src = sources[source_id]
     scope = request.args.get('scope')
     if scope == 'data':
-        json_content = io_utils.resource_get(src, 'data', station_id)
+        json_content = io_helper.resource_get(src, 'data', station_id)
         return jsonify(json_content)
     else:
         # not dealt with => back to default behaviour
         scope = ''
     if not scope:
         # default behaviour
-        json_content = io_utils.resource_get(src, 'list')
+        json_content = io_helper.resource_get(src, 'list')
         #json_content['properties']['source_name'] = src['name']
         station_feature = next((d for (index, d) in enumerate(json_content['features']) if d["properties"]["productIdentifier"] == station_id), None)
         json_content['features'] = [station_feature]

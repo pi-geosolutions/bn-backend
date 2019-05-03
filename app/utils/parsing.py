@@ -165,7 +165,8 @@ def _lake_header_to_geojson_feature(header_as_dict):
             completionDate = parser.parse(date)
             feature['properties']['completionDate'] = completionDate
         except:
-            print('date format invalid')
+            #print('date format invalid')
+            pass
     except KeyError as e:
         print('failed while extracting header information for hydroweb TXT file. {}'.format(e))
         raise HydrowebParsingError(

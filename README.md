@@ -9,16 +9,18 @@ Data is returned as JSON data
 
 **/api/v1/sources/<source_id>**: get definition of the source matching the given id
 
-**/api/v1/sources/<source_id>/stations**: get the list of stations for given data source id
+**/api/v1/sources/<source_id>/stations**: get the list of stations for given data source id (geojson)
 
 **/api/v1/sources/<source_id>/stations/<station_id>**: get station definition for given data source id and station id. 
-station_id is given by the `productIdentifier` field in the station definition
+station_id is given by the `productIdentifier` field in the station definition (geojson)
 
 **/api/v1/sources/<source_id>/stations/<station_id>?scope=data**: get the station's altimetric data (historical data)
 
+**/api/v1/stations**: get the merged list of stations from all sources (geojson)
+
 ## Configure data sources
 Data sources are, by default, configured in the sources.ini file. You will have to adjust the user and password 
-definitions int the theia-hydroweb details_uri
+definitions in the theia-hydroweb details_uri
 
 You can use your own sources definition file by providing the path with the SOURCES_CONFIG_FILE environment variable. 
 For example, using docker, you can mount the file as a volume and provide the corresponding path using the environment 
@@ -28,6 +30,13 @@ This even allows you to use secrets for your data sources file (best way to prot
 
 ## Override configuration
 You can override the app's configuration by pointing the env. var FLASK_CONFIG_FILE_PATH to your own configuration file.
+
+## Override configuration using Environment Variables
+The following other environment variables are supported:
+* SOURCES_CONFIG_FILE: path to the sources definition file
+* FLASK_CONFIG_FILE_PATH: path to the global config file for the app
+* STORAGE_PATH: path on the filesystem where the files will be written. The user running the app needs write access on 
+this path
 
 ## Dev setup
 

@@ -8,6 +8,7 @@ cycler==0.10.0
 decorator==4.4.0
 Flask==1.0.2
 Flask-Compress==1.4.0
+Flask-Cors==3.0.7
 idna==2.8
 ipython==7.4.0
 ipython-genutils==0.2.0
