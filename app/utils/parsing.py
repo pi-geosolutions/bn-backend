@@ -143,8 +143,8 @@ def _lake_header_to_geojson_feature(header_as_dict):
             'geometry': {
                 'type': 'Point',
                 'coordinates': [
-                    header_as_dict['lon'],
-                    header_as_dict['lat'],
+                    float(header_as_dict['lon']),
+                    float(header_as_dict['lat']),
                 ]
             },
             'properties': {
