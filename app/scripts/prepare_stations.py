@@ -46,7 +46,7 @@ def main():
     parser.add_argument('-t', '--thumbnails', help='generate stations graph thumbnails',
                         action='store_true')
     parser.add_argument('--storage_path',
-                        help='Where the generatd files will be stored (root folder). Defaults to /mnt/data')
+                        help='Where the generated files will be stored (root folder). Defaults to /mnt/data')
 
     args = parser.parse_args()
 

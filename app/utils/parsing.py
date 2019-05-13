@@ -3,6 +3,7 @@
 
 import os
 from dateutil import parser
+from datetime import datetime
 
 def txt2geojson(path):
     '''
@@ -124,10 +125,11 @@ def _station_header_to_geojson_feature(header_as_dict):
         }
         date = header_as_dict.get('date')
         try:
-            completionDate = parser.parse(date)
+            completionDate = datetime.strptime(date, "%Y-%m-%d")
             feature['properties']['completionDate'] = completionDate
         except:
-            print('date format invalid')
+            #print('date format invalid')
+            pass
     except KeyError as e:
         print('failed while extracting header information for hydroweb TXT file. {}'.format(e))
         raise HydrowebParsingError(
@@ -162,7 +164,7 @@ def _lake_header_to_geojson_feature(header_as_dict):
         }
         date = header_as_dict.get('date')
         try:
-            completionDate = parser.parse(date)
+            completionDate = datetime.strptime(date, "%Y-%m-%d")
             feature['properties']['completionDate'] = completionDate
         except:
             #print('date format invalid')

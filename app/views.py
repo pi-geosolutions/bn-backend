@@ -2,6 +2,7 @@
 
 import requests
 import json
+import random
 
 import utils.parsing as parsing
 
@@ -31,11 +32,18 @@ def list_all_stations():
     for src_name, src in sources.items():
         json_content = io_helper.resource_get(src, 'list')
         features.extend(json_content['features'])
+    # TODO: remove these 6 lines after demo
+    print(len(features))
+    random.shuffle(features)
+    features_dedup = []
+    for f in _deduplicate_helper(features):
+        features_dedup.append(f)
+    print(len(features_dedup))
     l = {
         'type': 'FeatureCollection',
         'properties': {},
-        'totalResults': len(features),
-        'features': features
+        'totalResults': len(features_dedup),
+        'features': features_dedup
     }
     return jsonify(l)
 
@@ -98,3 +106,11 @@ def get_stations(source_id, station_id):
         json_content['features'] = [station_feature]
         json_content['totalResults']=1
         return jsonify(json_content)
+
+def _deduplicate_helper(features):
+    seen = set()
+    for x in features:
+        t = tuple(x['geometry']['coordinates'])
+        if t not in seen:
+            yield x
+            seen.add(t)
