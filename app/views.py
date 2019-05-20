@@ -12,7 +12,6 @@ from flask import Flask, abort, request, jsonify, current_app
 from flask_cors import CORS
 
 from app import app, sources, io_helper
-from utils import io_utils
 
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 # TODO: pip install flask_cors
