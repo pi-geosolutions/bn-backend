@@ -22,7 +22,6 @@ from app import app
 
 # local to the module
 from utils import io_utils, parsing
-from utils.io_utils import IoHelper
 
 logger = logging.getLogger()
 io_helper = app.io_helper
@@ -41,13 +40,6 @@ def main():
                         action='store_true')
     parser.add_argument('--logfile',
                         help='logfile path. Default: prints logs to the console')
-    parser.add_argument('-l', '--list', help='only generate stations list',
-                        action='store_true')
-    parser.add_argument('-t', '--thumbnails', help='generate stations graph thumbnails',
-                        action='store_true')
-    parser.add_argument('--storage_path',
-                        help='Where the generated files will be stored (root folder). Defaults to /mnt/data')
-
     args = parser.parse_args()
 
 
