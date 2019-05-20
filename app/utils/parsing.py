@@ -11,30 +11,33 @@ def txt2geojson(path):
     :param path:
     :return:
     '''
-    with open(path) as file:
-        # read header (first line)
-        line = file.readline()
-
-        feature = _txt_header_to_geojson_feature(line)
-
-        # parse the rest
-        line = file.readline()
-        data = []
-        station_id = feature.get('properties').get('productIdentifier')
-        while line:
-            if not line.lstrip().startswith('#'):
-                line_data = _txt_parse_line_data(line)
-                line_data['identifier'] = station_id
-                data.append(line_data)
+    try:
+        with open(path) as file:
+            # read header (first line)
             line = file.readline()
 
-        feature['properties']['startDate'] = data[0].get('date_iso')
-        feature['properties']['completionDate'] = data[-1].get('date_iso')
-        # get the file name as ID
-        id = os.path.splitext(os.path.basename(path))[0]
-        feature['properties']['productIdentifier'] = id
-        feature['id'] = id
-        return feature
+            feature = _txt_header_to_geojson_feature(line)
+
+            # parse the rest
+            line = file.readline()
+            data = []
+            station_id = feature.get('properties').get('productIdentifier')
+            while line:
+                if not line.lstrip().startswith('#'):
+                    line_data = _txt_parse_line_data(line)
+                    line_data['identifier'] = station_id
+                    data.append(line_data)
+                line = file.readline()
+
+            feature['properties']['startDate'] = data[0].get('date_iso')
+            feature['properties']['completionDate'] = data[-1].get('date_iso')
+            # get the file name as ID
+            id = os.path.splitext(os.path.basename(path))[0]
+            feature['properties']['productIdentifier'] = id
+            feature['id'] = id
+            return feature
+    except FileNotFoundError as e:
+        return None
 
 
 def txt2data_vectors(path):
@@ -43,12 +46,15 @@ def txt2data_vectors(path):
     :param path: file path
     :return:
     """
-    data = txt2array(path)
-    x, y = zip(*data)
-    return {
-        'dates': x,
-        'h': y
-    }
+    try:
+        data = txt2array(path)
+        x, y = zip(*data)
+        return {
+            'dates': x,
+            'h': y
+        }
+    except FileNotFoundError as e:
+        return None
 
 
 def txt2array(path):
