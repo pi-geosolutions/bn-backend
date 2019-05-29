@@ -150,7 +150,12 @@ def get_nearby_stations(station_id):
     :return: list of close-by stations, by order of distance
     """
     nearbys = None
-    nb = 5
+    nb = 7
+    try:
+        nb = int(app.config['DEFAULT_NEARBY_LIMIT'])
+    except:
+        #TODO log error
+        pass
     limit = request.args.get('limit')
     if limit:
         try:
@@ -159,15 +164,16 @@ def get_nearby_stations(station_id):
             # we keep default
             pass
 
-    radius = request.args.get('radius')
-    if radius:
-        try:
-            radius = float(radius)
-        except ValueError:
-            # we keep default
-            pass
-        else:
-            nearbys = list(filter(lambda x: x['distance'] < radius, _get_nearby_stations(station_id)))
+    # deactivate radius for now to keep from interferences from Florent's UI
+    # radius = request.args.get('radius')
+    # if radius:
+    #     try:
+    #         radius = float(radius)
+    #     except ValueError:
+    #         # we keep default
+    #         pass
+    #     else:
+    #         nearbys = list(filter(lambda x: x['distance'] < radius, _get_nearby_stations(station_id)))
     if not nearbys:
         # default
         nearbys = _get_nearby_stations(station_id)[:nb]
@@ -204,6 +210,8 @@ def _all_stations_as_list():
 def _get_nearby_stations(station_id):
     ref_station = _get_any_station(station_id)['features'][0]
     all_stations = _all_stations_as_list()
+    # remove the ref station from list
+    all_stations.remove(ref_station)
     #nearbys = sorted([_distance(ref_station, s) for s in all_stations], key=lambda x: x[1])
     with_distance = [_distance(ref_station, s) for s in all_stations]
     nearbys = sorted(with_distance, key=operator.itemgetter('distance'))

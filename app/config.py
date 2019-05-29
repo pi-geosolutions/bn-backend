@@ -21,6 +21,7 @@ class BaseConfig(object):
     BABEL_DEFAULT_TIMEZONE = 'UTC'
     SOURCES_CONFIG_FILE = 'source.ini'
     STORAGE_PATH = '/mnt/data'
+    DEFAULT_NEARBY_LIMIT = 5
 
 
 class DevelopmentConfig(BaseConfig):
@@ -51,6 +52,7 @@ config = {
 ENVIRONMENT_OVERRIDES = [
     "SOURCES_CONFIG_FILE",
     "STORAGE_PATH",
+    "DEFAULT_NEARBY_LIMIT",
 ]
 
 def configure_app(app):

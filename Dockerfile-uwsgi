@@ -1,13 +1,12 @@
 FROM python:3.5-slim
-
+# Build a uwsgi image, to serve as base for python web apps
 MAINTAINER Jean Pommier "jean.pommier@pi-geosolutions.fr"
 
 COPY docker/resources /
-COPY requirements.txt /requirements.txt
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential python3-dev && \
-    pip install uwsgi && pip install -r /requirements.txt && \
+    pip install uwsgi && \
     apt-get remove -y build-essential python-dev && \
     rm -rf /var/lib/apt/lists/*
 
