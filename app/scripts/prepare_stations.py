@@ -2,9 +2,17 @@
 
 '''
 Reads the source configuration from app configuration,
-retrieves the stations list for each source,
-downloads the stations data locally for web resources,
+retrieves the stations list for web resources (only),
+downloads the stations data locally for web resources (only),
+generates the stations list file for every source (so that the list is homogeneous from one source to another),
 produces the png thumbnails.
+All data is stored in files. The paths patterns are defined in utils/io_utils.py (class IoHelper). The root path can be
+defined in the app's configuration
+
+For now, all data is retrieved and re-generated at every run.
+TODO: optimize the resource consumption.
+- Only process data that have new values
+- only get the new values for hydroweb resources available through api
 '''
 
 import logging
@@ -38,6 +46,8 @@ def main():
     ''')
     parser.add_argument('-v', '--verbose', help='verbose output (debug loglevel)',
                         action='store_true')
+    parser.add_argument('-f', '--force_update', help='update stations that are already on the disk',
+                        action='store_true')
     parser.add_argument('--logfile',
                         help='logfile path. Default: prints logs to the console')
     args = parser.parse_args()
@@ -57,6 +67,8 @@ def main():
         loglevel = logging.DEBUG
     logger.setLevel(loglevel)
 
+    if args.force_update:
+        FORCE_UPDATE = True
     srcs = app.sources
 
     for src_name, src in srcs.items():

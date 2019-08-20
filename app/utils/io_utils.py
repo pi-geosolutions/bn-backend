@@ -10,7 +10,7 @@ class IoHelper():
 
     def __init__(self, flask_app=None):
         self.app = flask_app
-        root_path = '/mnt/data2' # default
+        root_path = '/mnt/data' # default
         if self.app:
             root_path = self.app.config['STORAGE_PATH']
         self.paths = {
