@@ -3,6 +3,30 @@
 '''
 Reads the source configuration, scans the stations and produces the stations list in geojson format,
 similar to http://hydroweb.theia-land.fr/hydroweb/search?_m=light&lang=fr&basin=Niger&lake=&river=&status=&box=&q=
+
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
+DEPRECATED
 '''
 
 import logging

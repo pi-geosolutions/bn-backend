@@ -68,6 +68,7 @@ def main():
     logger.setLevel(loglevel)
 
     if args.force_update:
+        global FORCE_UPDATE
         FORCE_UPDATE = True
     srcs = app.sources
 
@@ -114,7 +115,9 @@ def _retrieve_stations_data(src, stations_list):
         url = src['details_uri'].format(id=f['properties']['productIdentifier'])
         dest_file = io_helper.paths['stations.data'].format(source_id=src['id'],
                                                            station_id = f['properties']['productIdentifier'])
-        if not FORCE_UPDATE:
+        if FORCE_UPDATE:
+            logger.debug("Downloading data for station {}".format(f['properties']['productIdentifier']))
+        else:
             # don't re-download the file if already present on the disk
             if path.exists(dest_file):
                 continue
