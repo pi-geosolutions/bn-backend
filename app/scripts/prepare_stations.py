@@ -21,6 +21,7 @@ import glob
 import json
 import numpy
 import requests
+import time
 import urllib.request
 from os import path, makedirs
 from matplotlib import pyplot, dates as mdates
@@ -121,7 +122,11 @@ def _retrieve_stations_data(src, stations_list):
             # don't re-download the file if already present on the disk
             if path.exists(dest_file):
                 continue
-        urllib.request.urlretrieve(url, dest_file)
+        try:
+            urllib.request.urlretrieve(url, dest_file)
+            time.sleep(0.2)
+        except Exception as e:
+            logger.debug("Error while retrieving {}: {}".format(url, e))
 
 
 def _generate_stations_list(src, files_list):
