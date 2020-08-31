@@ -1,5 +1,7 @@
-.venv
+.venv-old
 .idea
 __pycache__
+venv
+data
 *.log
 datasources.ini

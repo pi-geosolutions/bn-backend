@@ -22,8 +22,7 @@ import json
 import numpy
 import requests
 import time
-import urllib.request
-from os import path, makedirs
+from os import path, makedirs, remove
 from matplotlib import pyplot, dates as mdates
 from datetime import datetime
 
@@ -35,7 +34,7 @@ from utils import io_utils, parsing
 logger = logging.getLogger()
 io_helper = app.io_helper
 FORCE_UPDATE = False
-
+CLEAN_DEPRECATED_STATIONS = False
 
 def main():
     # Input arguments
@@ -48,6 +47,9 @@ def main():
     parser.add_argument('-v', '--verbose', help='verbose output (debug loglevel)',
                         action='store_true')
     parser.add_argument('-f', '--force_update', help='update stations that are already on the disk',
+                        action='store_true')
+    parser.add_argument('-c', '--clean_deprecated_stations',
+                        help='(http(s) sources only) remove stations that are not available online anymore',
                         action='store_true')
     parser.add_argument('--logfile',
                         help='logfile path. Default: prints logs to the console')
@@ -71,6 +73,9 @@ def main():
     if args.force_update:
         global FORCE_UPDATE
         FORCE_UPDATE = True
+    if args.clean_deprecated_stations:
+        global CLEAN_DEPRECATED_STATIONS
+        CLEAN_DEPRECATED_STATIONS = True
     srcs = app.sources
 
     for src_name, src in srcs.items():
@@ -93,11 +98,19 @@ def prepare_stations_for_source(src):
         if k.endswith('.folder'):
             makedirs(v.format(source_id = src['id']), exist_ok=True)
 
+    files = []
     if src['list_uri'].startswith("http"):
         r = requests.get(src['list_uri'])
-        _retrieve_stations_data(src, r.json())
+        unchanged_files_list, new_files_list =_retrieve_stations_data(src, r.json())
+        files = unchanged_files_list + new_files_list
+        if CLEAN_DEPRECATED_STATIONS: # remove stations that are on the disk but not any more listed on the http source
+            on_disk = glob.glob(io_helper.paths['stations.data'].format(source_id=src['id'], station_id='*'))
+            deprecated_stations = list( set(on_disk) - set(files) )
+            for station in deprecated_stations:
+                remove(station) # delete file
+    else:
+        files = glob.glob(io_helper.paths['stations.data'].format(source_id=src['id'], station_id='*'))
 
-    files = glob.glob(io_helper.paths['stations.data'].format(source_id=src['id'], station_id='*'))
     # create the stations list in geojson format,
     _generate_stations_list(src, files)
 
@@ -110,8 +123,10 @@ def _retrieve_stations_data(src, stations_list):
     Downloads the data files for each station of this data source and stores it locally for further use
     :param src:
     :param stations_list:
-    :return:
+    :return: lists tuple unchanged_files_list, new_files_list
     """
+    unchanged_files_list = []
+    new_files_list = []
     for f in stations_list['features']:
         url = src['details_uri'].format(id=f['properties']['productIdentifier'])
         dest_file = io_helper.paths['stations.data'].format(source_id=src['id'],
@@ -121,12 +136,20 @@ def _retrieve_stations_data(src, stations_list):
         else:
             # don't re-download the file if already present on the disk
             if path.exists(dest_file):
+                unchanged_files_list.append(dest_file)
                 continue
         try:
-            urllib.request.urlretrieve(url, dest_file)
-            time.sleep(0.2)
+            myfile = requests.get(url)
+            if myfile.status_code == 200 :
+                open(dest_file, 'wb').write(myfile.content)
+                time.sleep(0.2)
+                new_files_list.append(dest_file)
+            else :
+                raise Exception("Download error: status code is {}".format(myfile.status_code))
         except Exception as e:
             logger.debug("Error while retrieving {}: {}".format(url, e))
+            logger.exception(e)
+    return unchanged_files_list, new_files_list
 
 
 def _generate_stations_list(src, files_list):
