@@ -173,7 +173,7 @@ def _generate_stations_list(src, files_list):
 
     filename = io_helper.paths['stations.list'].format(source_id=src['id'])
     with open(filename, 'w') as outfile:
-        json.dump(stations_list, outfile, indent=2, sort_keys=False)
+        json.dump(stations_list, outfile, indent=2, sort_keys=False, default=str)
 
 
 def _generate_thumbnails(src, files_list):
@@ -184,7 +184,7 @@ def _generate_thumbnails(src, files_list):
         try:
             data = parsing.txt2data_vectors(file)
             # parse dates as dates
-            x = [datetime.strptime(ii, "%Y/%m/%d %H:%M") for ii in data['dates']]
+            x = [datetime.strptime(ii, "%Y-%m-%d %H:%M") for ii in data['dates']]
             a_x = numpy.asarray(x)
             a_y = numpy.asarray(data['h'], numpy.float32)
             #ax.xaxis.set_minor_locator(mdates.MonthLocator())

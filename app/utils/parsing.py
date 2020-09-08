@@ -25,6 +25,9 @@ metadata_tpl = {
     }
 capitalized_metadata=['river', 'lake', 'basin', 'country']
 
+HYDROWEB_v1 = 'v1'
+HYDROWEB_v2 = 'v2'
+
 
 def txt2geojson(path):
     '''
@@ -62,17 +65,13 @@ def txt2geojson(path):
                         pass
                     line = file.readline()
 
-                # fill metadata dict using the header
-                metadata = _v2_header_to_metadata(header, metadata)
-            else:
-                header = _txt_parse_header(line)
                 # extract start and last date
                 # get start date
                 line = file.readline()
                 while line:
                     if not line.lstrip().startswith('#'):
-                        line_data = _txt_parse_line_data(line)
-                        header['start_date'] = line_data['date_iso']
+                        line_data = _txt_parse_line_data(line, HYDROWEB_v2)
+                        header['start_date'] = line_data['timestamp_iso']
                         break
                     line = file.readline()
 
@@ -80,10 +79,31 @@ def txt2geojson(path):
                 file.seek(0, os.SEEK_END)
                 file.seek(file.tell() - 80, os.SEEK_SET)
                 line = file.readlines()[-1]
-                line_data = _txt_parse_line_data(line)
-                header['completion_date'] = line_data['date_iso']
-                metadata = _v1_header_to_metadata(header, metadata)
+                line_data = _txt_parse_line_data(line, HYDROWEB_v2)
+                header['completion_date'] = line_data['timestamp_iso']
 
+                # fill metadata dict using the header
+                metadata = _v2_header_to_metadata(header, metadata)
+            else:
+                # It's hydroweb v1 file
+                header = _txt_parse_header(line)
+                # extract start and last date
+                # get start date
+                line = file.readline()
+                while line:
+                    if not line.lstrip().startswith('#'):
+                        line_data = _txt_parse_line_data(line, HYDROWEB_v1)
+                        header['start_date'] = line_data['timestamp_iso']
+                        break
+                    line = file.readline()
+
+                # get last date
+                file.seek(0, os.SEEK_END)
+                file.seek(file.tell() - 80, os.SEEK_SET)
+                line = file.readlines()[-1]
+                line_data = _txt_parse_line_data(line, HYDROWEB_v1)
+                header['completion_date'] = line_data['timestamp_iso']
+                metadata = _v1_header_to_metadata(header, metadata)
 
             # create geojson feature out of collected metadata
             return _metadata_to_geojson_feature(metadata)
@@ -100,15 +120,15 @@ def _v1_header_to_metadata(header, metadata):
     :return:
     """
     metadata['version'] = '1.0'
-    metadata['short_version'] = '1'
+    metadata['short_version'] = HYDROWEB_v1
     metadata['type'] = header.get('type', '').lower()
-    metadata['name'] = header.get('station', '')
+    metadata['name'] = header.get('station', header.get('lake', ''))
     metadata['lat'] = header.get('lat', '0')
     metadata['lon'] = header.get('lon', '0')
     metadata['river'] = header.get('river', '')
     metadata['lake'] = header.get('lake', '')
     metadata['basin'] = header.get('basin', '')
-    metadata['country'] = ''
+    metadata['country'] = header.get('country', '')
     metadata['start_date'] = header.get('start_date', '')
     metadata['completion_date'] = header.get('completion_date', '')
 
@@ -125,7 +145,7 @@ def _v2_header_to_metadata(header, metadata):
     :return:
     """
     metadata['version'] = header.get('PRODUCT VERSION', '2.0')
-    metadata['short_version'] = '2'
+    metadata['short_version'] = HYDROWEB_v2
     metadata['type'] = header.get('STATUS', '').lower()
     metadata['name'] = metadata['id']
     metadata['lat'] = header.get('REFERENCE LATITUDE', '0')
@@ -134,8 +154,11 @@ def _v2_header_to_metadata(header, metadata):
     metadata['lake'] = header.get('LAKE', '')
     metadata['basin'] = header.get('BASIN', '')
     metadata['country'] = ''
-    metadata['start_date'] = header.get('FIRST DATE IN DATASET', '')
-    metadata['completion_date'] = header.get('LAST DATE IN DATASET', '')
+    metadata['start_date'] = header.get('FIRST DATE IN DATASET', '') + '00:00'
+    metadata['completion_date'] = header.get('LAST DATE IN DATASET', '') + '00:00'
+    # previous values lack time info. Following is better:
+    metadata['start_date'] = header.get('start_date', '')
+    metadata['completion_date'] = header.get('completion_date', '')
 
     metadata = _format_metadata(metadata)
     return metadata
@@ -144,8 +167,8 @@ def _v2_header_to_metadata(header, metadata):
 def _format_metadata(metadata):
     #fix date formats
     try:
-        metadata['start_date'] = datetime.strptime(metadata['start_date'], "%Y-%m-%d")
-        metadata['completion_date'] = datetime.strptime(metadata['completion_date'], "%Y-%m-%d")
+        metadata['start_date'] = datetime.strptime(metadata['start_date'], "%Y-%m-%d %H:%M")
+        metadata['completion_date'] = datetime.strptime(metadata['completion_date'], "%Y-%m-%d %H:%M")
     except:
         print('date format invalid')
         pass
@@ -184,14 +207,18 @@ def txt2array(path):
     with open(path) as file:
         # drop header (first line)
         line = file.readline()
+        file_version = HYDROWEB_v1
+        if line.lstrip().startswith('#'):
+            file_version = HYDROWEB_v2
+
 
         # parse the rest
         line = file.readline()
         data = []
         while line:
             if not line.lstrip().startswith('#'):
-                line_data = _txt_parse_line_data(line)
-                data.append((line_data['date_iso'],
+                line_data = _txt_parse_line_data(line, file_version)
+                data.append((line_data['timestamp_iso'],
                              float(line_data['water_surface_height_above_reference_datum'])
                              )
                             )
@@ -206,96 +233,6 @@ def _txt_parse_header(line):
     :return:
     '''
     return dict(item.strip().split('=')for item in line.split(';'))
-
-
-def _txt_header_to_geojson_feature(line):
-    '''
-    Converts the first line of a hydroweb TXT file to a geojson feature dict
-    :param line:
-    :return:
-    '''
-    header_as_dict = _txt_parse_header(line)
-    # TODO: reduce code redundancy here. Better would be to harmonize formats, see if hydroweb would change it for next version.
-    if line.startswith('lake'):
-        return _lake_header_to_geojson_feature(header_as_dict)
-    else:
-        return _station_header_to_geojson_feature(header_as_dict)
-
-def _station_header_to_geojson_feature(header_as_dict):
-    try:
-        feature = {
-            'type': 'Feature',
-            'id': header_as_dict['station'],
-            'geometry': {
-                'type': 'Point',
-                'coordinates': [
-                    float(header_as_dict['lon']),
-                    float(header_as_dict['lat']),
-                ]
-            },
-            'properties': {
-                'name': header_as_dict.get('station', ''),
-                'startDate': '',
-                'completionDate': '',
-                'status': header_as_dict.get('type', ''),
-                'country': str(header_as_dict.get('country', '')).capitalize(),
-                'river': str(header_as_dict.get('river', '')).capitalize(),
-                'lake': str(header_as_dict.get('lake', '')).capitalize(),
-                'basin': str(header_as_dict.get('basin', '')).capitalize(),
-                'type': header_as_dict.get('type', ''),
-            }
-        }
-        date = header_as_dict.get('date')
-        try:
-            completionDate = datetime.strptime(date, "%Y-%m-%d")
-            feature['properties']['completionDate'] = completionDate
-        except:
-            #print('date format invalid')
-            pass
-    except KeyError as e:
-        print('failed while extracting header information for hydroweb TXT file. {}'.format(e))
-        raise HydrowebParsingError(
-            'failed while extracting header information for hydroweb TXT file. {}'.format(e)) from e
-    return feature
-
-
-def _lake_header_to_geojson_feature(header_as_dict):
-    try:
-        feature = {
-            'type': 'Feature',
-            'id': header_as_dict['lake'],
-            'geometry': {
-                'type': 'Point',
-                'coordinates': [
-                    float(header_as_dict['lon']),
-                    float(header_as_dict['lat']),
-                ]
-            },
-            'properties': {
-                'collection': 'research_stations',
-                'name': header_as_dict.get('lake', ''),
-                'startDate': '',
-                'completionDate': '',
-                'status': header_as_dict.get('type', ''),
-                'country': str(header_as_dict.get('country', '')).capitalize(),
-                'river': str(header_as_dict.get('river', '')).capitalize(),
-                'lake': str(header_as_dict.get('lake', '')).capitalize(),
-                'basin': str(header_as_dict.get('basin', '')).capitalize(),
-                'type': header_as_dict.get('type', ''),
-            }
-        }
-        date = header_as_dict.get('date')
-        try:
-            completionDate = datetime.strptime(date, "%Y-%m-%d")
-            feature['properties']['completionDate'] = completionDate
-        except:
-            #print('date format invalid')
-            pass
-    except KeyError as e:
-        print('failed while extracting header information for hydroweb TXT file. {}'.format(e))
-        raise HydrowebParsingError(
-            'failed while extracting header information for hydroweb TXT file. {}'.format(e)) from e
-    return feature
 
 
 def _metadata_to_geojson_feature(metadata):
@@ -336,22 +273,31 @@ def _metadata_to_geojson_feature(metadata):
 
 
 
-def _txt_parse_line_data(line):
+def _txt_parse_line_data(line, file_version):
     """
     Create data dict from a data line
     We assume the date is timezone UTC
     :param line: line of data (semi-colon-separated
     :return: data dict
     """
-    entries = line.split(';')
-    data = {
-        'time' : entries[0].strip(),
-        'date_iso' : '{} {}'.format(entries[1].strip(), entries[2].strip()),
-        'water_surface_height_above_reference_datum': entries[3].strip(),
-        'water_surface_height_uncertainty': entries[4].strip(),
-        'number_of_observations': entries[5].strip(),
-        'satellite_cycle_number': entries[6].strip(),
-    }
+    data = None
+    if file_version == HYDROWEB_v2:
+        entries = line.split(' ')
+        data = {
+            'date_iso' : '{}'.format(entries[0].strip()),
+            'timestamp_iso' : '{} {}'.format(entries[0].strip(), entries[1].strip()),
+            'water_surface_height_above_reference_datum': entries[2].strip(),
+            'water_surface_height_uncertainty': entries[3].strip(),
+        }
+    else: # HYDROWEB_v1
+        entries = line.split(';')
+        data = {
+            'time' : entries[0].strip(),
+            'date_iso' : '{}'.format(entries[1].strip().replace('/', '-')),
+            'timestamp_iso' : '{} {}'.format(entries[1].strip().replace('/', '-'), entries[2].strip()),
+            'water_surface_height_above_reference_datum': entries[3].strip(),
+            'water_surface_height_uncertainty': entries[4].strip(),
+        }
     return data
 
 class HydrowebParsingError(Exception):
