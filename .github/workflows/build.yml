@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  push_to_registry:
+    name: Build then push to docker hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check out the repo"
+        uses: actions/checkout@v2
+      - name: "Register the DOCKER_TAG env variable / saving start date"
+        run: |
+          export BUILD_DATE=$(date +"%Y%m%d-%H%M%S")
+          date +%s%3N > start
+          echo "::set-env name=DOCKER_TAG::$BUILD_DATE-$(git rev-parse --short HEAD)"
+      - name: "Build  and push to Docker Hub"
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: pigeosolutions/bn-backend
+          tags: latest, ${{ env.DOCKER_TAG }}
