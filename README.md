@@ -55,6 +55,11 @@ pip install -r requirements.txt
 `python app/main.py`
 Then open http://localhost:5000/api/v1/sources
 
+Or using docker:
+```
+docker run -p 5000:5000 -it  -v [PATH TO YOUR SOURCES FILE]/datasources.ini:/sources.ini -e SOURCES_CONFIG_FILE="/sources.ini" -v [PATH TO YOUR DATA FOLDER]/data:/mnt/data   pigeosolutions/bn-backend
+```
+
 ### Build docker image
 `docker build . -t pigeosolutions/bn-backend`
 
