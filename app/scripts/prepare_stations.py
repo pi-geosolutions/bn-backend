@@ -20,9 +20,10 @@ import argparse
 import glob
 import json
 import numpy
+import re
 import requests
 import time
-from os import path, makedirs, remove
+from os import path, makedirs, remove, getenv
 from matplotlib import pyplot, dates as mdates
 from datetime import datetime
 
@@ -125,10 +126,23 @@ def _retrieve_stations_data(src, stations_list):
     :param stations_list:
     :return: lists tuple unchanged_files_list, new_files_list
     """
+    details_uri = src['details_uri']
+
+    # replace env vars by their values. Used particularly for password
+    patterns = re.findall(r'{{.+?}}', details_uri)
+    for p in patterns:
+        # replace every pattern by its matching env var if available
+        try:
+            value = getenv(str(p).replace('{{', '').replace('}}', ''))
+            details_uri = details_uri.replace(p, value)
+        except:
+            pass
+
     unchanged_files_list = []
     new_files_list = []
     for f in stations_list['features']:
-        url = src['details_uri'].format(id=f['properties']['productIdentifier'])
+        url = details_uri.format(id=f['properties']['productIdentifier'])
+
         dest_file = io_helper.paths['stations.data'].format(source_id=src['id'],
                                                            station_id = f['properties']['productIdentifier'])
         if FORCE_UPDATE:

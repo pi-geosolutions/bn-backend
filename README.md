@@ -22,6 +22,17 @@ station_id is given by the `productIdentifier` field in the station definition (
 Data sources are, by default, configured in the sources.ini file. You will have to adjust the user and password 
 definitions in the theia-hydroweb details_uri
 
+### Providing credentials as environment variables
+The http://hydroweb.theia-land.fr/hydroweb service, for instance, requires you to provide user credentials. You *should 
+not provide them in the source.ini file* , as this will be shown on the /api/v1/sources endpoint. Instead, you are 
+advised to use environment variables. When the service meets a {{ MY_VAR }} token, it tries to replace it by the 
+corresponding environment variable. For instance, 
+`details_uri= http://hydroweb.theia-land.fr/hydroweb/authdownload?products={id}&user={{HYDROWEB_USER}}&pwd={{HYDROWEB_PASSWORD}}&format=txt` will look for 
+HYDROWEB_USER and HYDROWEB_PASSWORD environment variables and replace them if they are defined.
+
+The /api/v1/sources endpoint will still show the raw uri, keeping prying eyes from your super secure password.
+
+### Specify the sources.ini file location 
 You can use your own sources definition file by providing the path with the SOURCES_CONFIG_FILE environment variable. 
 For example, using docker, you can mount the file as a volume and provide the corresponding path using the environment 
 variable : 
