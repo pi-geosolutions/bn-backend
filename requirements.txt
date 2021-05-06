@@ -1,6 +1,6 @@
 Flask==1.0.2
 Flask-Compress==1.4.0
-Flask-Cors==3.0.7
+Flask-Cors==3.0.9
 Jinja2==2.10.1
 configs==3.0.3
 geojson==2.4.1
