@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM python:3.7
 
 MAINTAINER Jean Pommier "jean.pommier@pi-geosolutions.fr"
 
@@ -6,9 +6,7 @@ COPY docker/resources /
 COPY requirements.txt /requirements.txt
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential python3-dev && \
     pip install uwsgi && pip install -r /requirements.txt && \
-    apt-get remove -y build-essential python-dev && \
     rm -rf /var/lib/apt/lists/*
 
 ENV LC_ALL=C.UTF-8

@@ -23,9 +23,10 @@ import numpy
 import re
 import requests
 import time
-from os import path, makedirs, remove, getenv
+from os import environ, path, makedirs, remove, getenv
 from matplotlib import pyplot, dates as mdates
 from datetime import datetime
+from urllib3.exceptions import NewConnectionError
 
 from app import app
 
@@ -36,6 +37,10 @@ logger = logging.getLogger()
 io_helper = app.io_helper
 FORCE_UPDATE = False
 CLEAN_DEPRECATED_STATIONS = False
+
+REQUESTS_MAX_RETRIES=int(environ.get('REQUESTS_MAX_RETRIES','5'))
+REQUESTS_PAUSE_TIME=int(environ.get('REQUESTS_PAUSE_TIME','5'))
+REQUESTS_INTERVAL=int(environ.get('REQUESTS_INTERVAL','2'))
 
 def main():
     # Input arguments
@@ -83,6 +88,10 @@ def main():
         prepare_stations_for_source(src)
 
 
+class ShouldPauseDownloadException(Exception):
+    pass
+
+
 def prepare_stations_for_source(src):
     """
     Reads the source configuration from app configuration,
@@ -118,7 +127,6 @@ def prepare_stations_for_source(src):
     # generate graph thumbnails
     _generate_thumbnails(src, files)
 
-
 def _retrieve_stations_data(src, stations_list):
     """
     Downloads the data files for each station of this data source and stores it locally for further use
@@ -152,16 +160,27 @@ def _retrieve_stations_data(src, stations_list):
             if path.exists(dest_file):
                 unchanged_files_list.append(dest_file)
                 continue
+        myfile = None
+        retries = 0
         try:
-            myfile = requests.get(url)
+            while myfile is None and retries < REQUESTS_MAX_RETRIES:
+                try:
+                    myfile = requests.get(url)
+                except (requests.exceptions.ReadTimeout , NewConnectionError) as err:
+                    logger.warning("Error while retrieving {}: {}. Pausing and retrying".format(url, err))
+                    time.sleep(REQUESTS_PAUSE_TIME)
+
             if myfile.status_code == 200 :
                 open(dest_file, 'wb').write(myfile.content)
                 time.sleep(0.2)
                 new_files_list.append(dest_file)
             else :
                 raise Exception("Download error: status code is {}".format(myfile.status_code))
+        except (requests.exceptions.ReadTimeout , NewConnectionError) as err:
+            logger.warning("Error while retrieving {}: {}".format(url, err))
+            raise ShouldPauseDownloadException
         except Exception as e:
-            logger.debug("Error while retrieving {}: {}".format(url, e))
+            logger.warning("Error while retrieving {}: {}".format(url, e))
             logger.exception(e)
     return unchanged_files_list, new_files_list
 

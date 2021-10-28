@@ -9,8 +9,7 @@ class BaseConfig(object):
     TESTING = False
     # sqlite :memory: identifier is the default if no filepath is present
     LOGGING_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    LOGGING_LOCATION = 'app.log'
-    LOGGING_LEVEL = logging.DEBUG
+    LOGGING_LEVEL = logging.INFO
     CACHE_TYPE = 'simple'
     COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml',
                           'application/json', 'application/javascript']
@@ -27,18 +26,21 @@ class BaseConfig(object):
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = False
+    LOGGING_LEVEL = logging.DEBUG
     ENV = 'dev'
 
 
 class StagingConfig(BaseConfig):
     DEBUG = False
     TESTING = True
+    LOGGING_LEVEL = logging.INFO
     ENV = 'staging'
 
 
 class ProductionConfig(BaseConfig):
     DEBUG = False
     TESTING = False
+    LOGGING_LEVEL = logging.WARN
     ENV = 'prod'
 
 
@@ -70,7 +72,7 @@ def configure_app(app):
             app.config[conf_var] = sourcepath
 
     # Configure logging
-    handler = logging.FileHandler(app.config['LOGGING_LOCATION'])
+    handler = logging.StreamHandler('wsgi')
     handler.setLevel(app.config['LOGGING_LEVEL'])
     formatter = logging.Formatter(app.config['LOGGING_FORMAT'])
     handler.setFormatter(formatter)
