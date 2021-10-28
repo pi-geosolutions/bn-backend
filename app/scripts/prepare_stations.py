@@ -127,6 +127,9 @@ def prepare_stations_for_source(src):
     # generate graph thumbnails
     _generate_thumbnails(src, files)
 
+    if REQUESTS_INTERVAL > 0:
+        time.sleep(REQUESTS_INTERVAL)
+
 def _retrieve_stations_data(src, stations_list):
     """
     Downloads the data files for each station of this data source and stores it locally for further use
@@ -176,9 +179,6 @@ def _retrieve_stations_data(src, stations_list):
                 new_files_list.append(dest_file)
             else :
                 raise Exception("Download error: status code is {}".format(myfile.status_code))
-        except (requests.exceptions.ReadTimeout , NewConnectionError) as err:
-            logger.warning("Error while retrieving {}: {}".format(url, err))
-            raise ShouldPauseDownloadException
         except Exception as e:
             logger.warning("Error while retrieving {}: {}".format(url, e))
             logger.exception(e)
