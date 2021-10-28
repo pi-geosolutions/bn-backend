@@ -17,7 +17,7 @@ jobs:
         run: |
           export BUILD_DATE=$(date +"%Y%m%d-%H%M%S")
           date +%s%3N > start
-          echo "::set-env name=DOCKER_TAG::$BUILD_DATE-$(git rev-parse --short HEAD)"
+          echo "DOCKER_TAG=$BUILD_DATE-$(git rev-parse --short HEAD)" >>  $GITHUB_ENV
       - name: "Build  and push to Docker Hub"
         uses: docker/build-push-action@v1
         with:
