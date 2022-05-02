@@ -39,6 +39,17 @@ io_helper = app.io_helper
 CLEAN_DEPRECATED_STATIONS = False
 
 REQUESTS_MAX_RETRIES=int(environ.get('REQUESTS_MAX_RETRIES','5'))
+# Configure requests object
+retry_strategy = Retry(
+    total=REQUESTS_MAX_RETRIES,
+    backoff_factor=1,
+    status_forcelist=[429, 500, 502, 503, 504],
+    method_whitelist=["HEAD", "GET", "OPTIONS"]
+)
+adapter = HTTPAdapter(max_retries=retry_strategy)
+http = requests.Session()
+http.mount("https://", adapter)
+http.mount("http://", adapter)
 
 def main():
     # Input arguments
@@ -58,7 +69,6 @@ def main():
     parser.add_argument('-f', '--force', help='DEPRECATED',
                         action='store_true')
     args = parser.parse_args()
-
 
     # INITIALIZE LOGGER
     handler = logging.StreamHandler()
@@ -112,7 +122,7 @@ def prepare_stations_for_source(src):
 
     # Retrieve the data.
     if src['list_uri'].startswith("http"):
-        r = requests.get(src['list_uri'])
+        r = http.get(src['list_uri'])
         _retrieve_stations_data(src, r.json())
 
     # Get the files list
@@ -145,6 +155,7 @@ def _retrieve_stations_data(src, stations_list):
         except:
             pass
 
+
     for f in stations_list['features']:
         url = details_uri.format(id=f['properties']['productIdentifier'])
 
@@ -152,16 +163,6 @@ def _retrieve_stations_data(src, stations_list):
                                                            station_id = f['properties']['productIdentifier'])
 
         # Download files using requests.Retry to handle timeouts and server failures
-        retry_strategy = Retry(
-            total=REQUESTS_MAX_RETRIES,
-            backoff_factor=1,
-            status_forcelist=[429, 500, 502, 503, 504],
-            method_whitelist=["HEAD", "GET", "OPTIONS"]
-        )
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        http = requests.Session()
-        http.mount("https://", adapter)
-        http.mount("http://", adapter)
 
         response = http.get(url)
         response.raise_for_status()
