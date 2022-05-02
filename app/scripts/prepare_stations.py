@@ -55,7 +55,7 @@ def main():
     parser.add_argument('-f', '--force_update', help='update stations that are already on the disk',
                         action='store_true')
     parser.add_argument('-c', '--clean_deprecated_stations',
-                        help='(http(s) sources only) remove stations that are not available online anymore',
+                        help='[http(s) sources only] remove stations that are not available online anymore',
                         action='store_true')
     parser.add_argument('--logfile',
                         help='logfile path. Default: prints logs to the console')

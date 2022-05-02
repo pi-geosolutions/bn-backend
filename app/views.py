@@ -215,7 +215,7 @@ def _get_nearby_stations(station_id):
     #nearbys = sorted([_distance(ref_station, s) for s in all_stations], key=lambda x: x[1])
     with_distance = [_distance(ref_station, s) for s in all_stations]
     nearbys = sorted(with_distance, key=operator.itemgetter('distance'))
-    print(nearbys)
+    # print(nearbys)
     return nearbys
 
 
