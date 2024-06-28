@@ -8,7 +8,7 @@ fresh: docker-pull-deps docker-build-latest
 fresh-push: docker-pull-deps docker-build-push
 
 docker-pull-deps:
-	docker pull python:3.7
+	docker pull python:3.11-bookworm
 
 docker-build-latest:
 	docker build -t pigeosolutions/bn-backend:latest .

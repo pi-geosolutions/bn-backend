@@ -45,10 +45,11 @@ def txt2geojson(path):
 
     # Read header
     try:
-        with open(path) as file:
+        # Opening the file in binary mode to get optimized access to last line directly (see below)
+        with open(path, "rb") as file:
             # read header (first line)
-            line = file.readline()
-
+            line = file.readline().decode()
+            # decode() Required since reading in binary mode. By default decodes using UTF8 encoding
             # Check file version
             if line.lstrip().startswith('#'):
                 # It's hydroweb v2 file
@@ -63,22 +64,22 @@ def txt2geojson(path):
                         header[entry[0]] = entry[1].strip()
                     else:
                         pass
-                    line = file.readline()
+                    line = file.readline().decode()
 
                 # extract start and last date
-                # get start date
-                line = file.readline()
+                # get start date (will be in the lien read above (last in the loop)
                 while line:
                     if not line.lstrip().startswith('#'):
                         line_data = _txt_parse_line_data(line, HYDROWEB_v2)
                         header['start_date'] = line_data['timestamp_iso']
                         break
-                    line = file.readline()
+                    line = file.readline().decode()
 
                 # get last date
-                file.seek(0, os.SEEK_END)
-                file.seek(file.tell() - 80, os.SEEK_SET)
-                line = file.readlines()[-1]
+                file.seek(-2, os.SEEK_END)
+                while file.read(1) != b'\n':
+                    file.seek(-2, os.SEEK_CUR)
+                line = file.readline().decode()
                 line_data = _txt_parse_line_data(line, HYDROWEB_v2)
                 header['completion_date'] = line_data['timestamp_iso']
 
@@ -89,18 +90,19 @@ def txt2geojson(path):
                 header = _txt_parse_header(line)
                 # extract start and last date
                 # get start date
-                line = file.readline()
+                line = file.readline().decode()
                 while line:
                     if not line.lstrip().startswith('#'):
                         line_data = _txt_parse_line_data(line, HYDROWEB_v1)
                         header['start_date'] = line_data['timestamp_iso']
                         break
-                    line = file.readline()
+                    line = file.readline().decode()
 
                 # get last date
-                file.seek(0, os.SEEK_END)
-                file.seek(file.tell() - 80, os.SEEK_SET)
-                line = file.readlines()[-1]
+                file.seek(-2, os.SEEK_END)
+                while file.read(1) != b'\n':
+                    file.seek(-2, os.SEEK_CUR)
+                line = file.readline().decode()
                 line_data = _txt_parse_line_data(line, HYDROWEB_v1)
                 header['completion_date'] = line_data['timestamp_iso']
                 metadata = _v1_header_to_metadata(header, metadata)
