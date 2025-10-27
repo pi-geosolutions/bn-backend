@@ -1,6 +1,6 @@
 FROM python:3.11-bookworm
 
-MAINTAINER Jean Pommier "jean.pommier@pi-geosolutions.fr"
+LABEL author="Jean Pommier <jean.pommier@pi-geosolutions.fr>"
 
 COPY docker/resources /
 COPY requirements.txt /requirements.txt
