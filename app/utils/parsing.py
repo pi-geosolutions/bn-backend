@@ -284,7 +284,7 @@ def _txt_parse_line_data(line, file_version):
     """
     data = None
     if file_version == HYDROWEB_v2:
-        entries = line.split(' ')
+        entries = [ en for en in line.split(' ') if en not in ('', ':')]
         data = {
             'date_iso' : '{}'.format(entries[0].strip()),
             'timestamp_iso' : '{} {}'.format(entries[0].strip(), entries[1].strip()),
